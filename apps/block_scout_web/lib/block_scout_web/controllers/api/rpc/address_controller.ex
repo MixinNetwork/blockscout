@@ -220,6 +220,25 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
     end
   end
 
+  def assets(conn, params) do
+    with {:address_param, {:ok, address_param}} <- fetch_address(params),
+         {:format, {:ok, address_hash}} <- to_address_hash(address_param),
+         {:address, :ok} <- {:address, Chain.check_address_exists(address_hash)},
+         {:ok, token_list} <- list_tokens(address_hash) do
+      token = Chain.list_top_tokens(nil)
+      render(conn, :assets, %{balanced: token_list, default: token})
+    else
+      {:address_param, :error} ->
+        render(conn, :error, error: "Query parameter address is required")
+
+      {:format, :error} ->
+        render(conn, :error, error: "Invalid address format")
+
+      {_, :not_found} ->
+        render(conn, :error, error: "No tokens found", data: [])
+    end
+  end
+
   def getminedblocks(conn, params) do
     options = Helpers.put_pagination_options(%{}, params)
 

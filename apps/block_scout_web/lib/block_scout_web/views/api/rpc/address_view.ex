@@ -52,6 +52,21 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
     RPCView.render("show.json", data: data)
   end
 
+  def render("assets.json", %{balanced: balanced, default: default}) do
+    conf = Application.get_env(:block_scout_web, BlockScoutWeb.API.RPC.AddressController)
+    mvm_default_assets = conf[:mvm_default_assets]
+
+    balanced = Enum.map(balanced, &prepare_token/1)
+    default = Enum.filter(Enum.map(default, &prepare_default_token/1), fn x -> Enum.member?(mvm_default_assets, x["contractAddress"]) end)
+
+    tmp = Enum.filter(default, fn x ->
+      i = Enum.find_index(balanced, fn a -> a["contractAddress"] === x["contractAddress"] end)
+      i === nil
+    end)
+    balanced = balanced ++ tmp
+    RPCView.render("show.json", data: balanced)
+  end
+
   def render("getminedblocks.json", %{blocks: blocks}) do
     data = Enum.map(blocks, &prepare_block/1)
     RPCView.render("show.json", data: data)
@@ -207,6 +222,17 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
       "type" => token.type
     }
     |> (&if(is_nil(token.id), do: &1, else: Map.put(&1, "id", token.id))).()
+  end
+
+  defp prepare_default_token(token) do
+    %{
+      "balance" => "0",
+      "contractAddress" => to_string(token.contract_address_hash),
+      "name" => token.name,
+      "decimals" => to_string(token.decimals),
+      "symbol" => token.symbol,
+      "type" => token.type
+    }
   end
 
   defp balance(address) do
