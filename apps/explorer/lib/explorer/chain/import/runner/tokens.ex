@@ -212,19 +212,21 @@ defmodule Explorer.Chain.Import.Runner.Tokens do
           #   need to be migrated with `priv/repo/migrations/scripts/update_new_tokens_holder_count_in_batches.sql.exs`
           # Don't update `contract_address_hash` as it is the primary key and used for the conflict target
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", token.inserted_at),
-          updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", token.updated_at)
+          updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", token.updated_at),
+          asset_id: fragment("EXCLUDED.asset_id")
         ]
       ],
       where:
         fragment(
-          "(EXCLUDED.name, EXCLUDED.symbol, EXCLUDED.total_supply, EXCLUDED.decimals, EXCLUDED.type, EXCLUDED.cataloged, EXCLUDED.skip_metadata) IS DISTINCT FROM (?, ?, ?, ?, ?, ?, ?)",
+          "(EXCLUDED.name, EXCLUDED.symbol, EXCLUDED.total_supply, EXCLUDED.decimals, EXCLUDED.type, EXCLUDED.cataloged, EXCLUDED.skip_metadata, EXCLUDED.asset_id) IS DISTINCT FROM (?, ?, ?, ?, ?, ?, ?, ?)",
           token.name,
           token.symbol,
           token.total_supply,
           token.decimals,
           token.type,
           token.cataloged,
-          token.skip_metadata
+          token.skip_metadata,
+          token.asset_id
         )
     )
   end

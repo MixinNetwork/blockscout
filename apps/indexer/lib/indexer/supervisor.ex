@@ -22,6 +22,7 @@ defmodule Indexer.Supervisor do
     InternalTransaction,
     PendingTransaction,
     ReplacedTransaction,
+    Asset,
     Token,
     TokenBalance,
     TokenInstance,
@@ -114,6 +115,7 @@ defmodule Indexer.Supervisor do
          [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
         {CoinBalance.Supervisor,
          [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+        {Asset.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
         {Token.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
         {TokenInstance.Supervisor,
          [
