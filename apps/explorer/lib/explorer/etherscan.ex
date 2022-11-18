@@ -334,7 +334,8 @@ defmodule Explorer.Etherscan do
           decimals: t.decimals,
           symbol: t.symbol,
           type: t.type,
-          id: ctb.token_id
+          id: ctb.token_id,
+          asset_id: t.asset_id
         }
       )
 
