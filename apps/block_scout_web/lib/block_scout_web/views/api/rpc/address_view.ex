@@ -3,6 +3,7 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
 
   alias BlockScoutWeb.API.EthRPC.View, as: EthRPCView
   alias BlockScoutWeb.API.RPC.RPCView
+  alias BlockScoutWeb.MIXIN_API
 
   def render("listaccounts.json", %{accounts: accounts}) do
     accounts = Enum.map(accounts, &prepare_account/1)
@@ -59,12 +60,23 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
     balanced = Enum.map(balanced, &prepare_token/1)
     default = Enum.filter(Enum.map(default, &prepare_default_token/1), fn x -> Enum.member?(mvm_default_assets, x["contractAddress"]) end)
 
-    tmp = Enum.filter(default, fn x ->
+    defaultAssets = Enum.filter(default, fn x ->
       i = Enum.find_index(balanced, fn a -> a["contractAddress"] === x["contractAddress"] end)
       i === nil
     end)
-    balanced = balanced ++ tmp
-    RPCView.render("show.json", data: balanced)
+    merged = balanced ++ defaultAssets
+
+    final = Enum.map(merged, fn x -> 
+      res = MIXIN_API.request("/network/assets/" <> x["asset_id"])
+      case res do
+        {:ok, asset} -> 
+          x = Map.merge(x, asset)
+          x
+        {:error, _} -> x
+      end
+    end)
+
+    RPCView.render("show.json", data: final)
   end
 
   def render("getminedblocks.json", %{blocks: blocks}) do
