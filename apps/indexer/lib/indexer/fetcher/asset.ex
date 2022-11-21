@@ -74,7 +74,7 @@ defmodule Indexer.Fetcher.Asset do
     if token_params.asset_id == old_asset_id do
       :ok
     else
-      {:ok, token} = Chain.update_token(%{token | updated_at: DateTime.utc_now()}, token_params)
+      {:ok, _} = Chain.update_token(%{token | updated_at: DateTime.utc_now()}, token_params)
       :ok
     end
   end
