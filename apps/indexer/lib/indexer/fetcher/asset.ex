@@ -42,7 +42,7 @@ defmodule Indexer.Fetcher.Asset do
   @impl BufferedTask
   def init(initial_acc, reducer, _) do
     {:ok, acc} =
-      Chain.stream_erc20_token_without_asset_id(initial_acc, fn address, acc ->
+      Chain.stream_erc20_token(initial_acc, fn address, acc ->
         reducer.(address, acc)
       end)
 
@@ -68,10 +68,14 @@ defmodule Indexer.Fetcher.Asset do
     BufferedTask.buffer(__MODULE__, token_contract_addresses)
   end
 
-  defp update_token_asset_id(%Token{contract_address_hash: contract_address_hash} = token) do
+  defp update_token_asset_id(%Token{contract_address_hash: contract_address_hash, asset_id: old_asset_id} = token) do
     token_params = MapRetriever.get_functions_of(contract_address_hash)
 
-    {:ok, token} = Chain.update_token(%{token | updated_at: DateTime.utc_now()}, token_params)
-    :ok
+    if token_params.asset_id == old_asset_id do
+      :ok
+    else
+      {:ok, token} = Chain.update_token(%{token | updated_at: DateTime.utc_now()}, token_params)
+      :ok
+    end
   end
 end

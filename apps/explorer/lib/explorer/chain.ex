@@ -4569,12 +4569,11 @@ defmodule Explorer.Chain do
     Repo.stream_reduce(query, initial, reducer)
   end
 
-  def stream_erc20_token_without_asset_id(initial, reducer) when is_function(reducer, 2) do
+  def stream_erc20_token(initial, reducer) when is_function(reducer, 2) do
     query =
       from(
         token in Token,
         where: token.type == "ERC-20",
-        where: is_nil(token.asset_id),
         select: token.contract_address_hash
       )
 
