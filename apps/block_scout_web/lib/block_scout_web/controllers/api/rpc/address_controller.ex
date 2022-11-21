@@ -6,6 +6,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
   alias Explorer.Chain.{Address, Wei}
   alias Explorer.Etherscan.{Addresses, Blocks}
   alias Indexer.Fetcher.CoinBalanceOnDemand
+  alias BlockScoutWeb.MIXIN_API
 
   def listaccounts(conn, params) do
     options =
@@ -225,8 +226,35 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
          {:format, {:ok, address_hash}} <- to_address_hash(address_param),
          {:address, :ok} <- {:address, Chain.check_address_exists(address_hash)},
          {:ok, token_list} <- list_tokens(address_hash) do
-      token = Chain.list_top_tokens(nil)
-      render(conn, :assets, %{balanced: token_list, default: token})
+      conf = Application.get_env(:block_scout_web, BlockScoutWeb.API.RPC.AddressController)
+      mvm_default_assets = conf[:mvm_default_assets]
+      user_assets_with_balance = Enum.map(token_list, fn x -> to_string(x.contract_address_hash) end)
+
+      total_assets = Chain.list_top_tokens(nil)
+      default_assets = Enum.filter(total_assets, fn x ->
+        contract = to_string(x.contract_address_hash)
+        not Enum.member?(user_assets_with_balance, contract)
+          and Enum.member?(mvm_default_assets, contract)
+      end)
+      merged = Enum.map(token_list ++ default_assets, fn x -> %{
+        "balance" => case Map.has_key?(x, :balance) do true -> to_string(x.balance); _ -> "0" end,
+        "contractAddress" => to_string(x.contract_address_hash),
+        "name" => x.name,
+        "decimals" => to_string(x.decimals),
+        "symbol" => x.symbol,
+        "type" => x.type,
+        "asset_id" => x.asset_id
+      } end)
+
+      final = Enum.map(merged, fn x ->
+        res = MIXIN_API.request("/network/assets/" <> x["asset_id"])
+        case res do
+          {:ok, asset} -> Map.merge(x, asset)
+          {:error, _} -> x
+        end 
+      end)
+
+      render(conn, :assets, %{asset_list: final})
     else
       {:address_param, :error} ->
         render(conn, :error, error: "Query parameter address is required")
