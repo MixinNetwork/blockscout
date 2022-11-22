@@ -6,7 +6,7 @@ defmodule Explorer.Registry.MapRetriever do
   require Logger
 
   alias Ecto.UUID
-  alias Explorer.Chain.{Hash, Token}
+  alias Explorer.Chain.Hash
   alias Explorer.SmartContract.Reader
 
   @contract_abi [
@@ -31,39 +31,6 @@ defmodule Explorer.Registry.MapRetriever do
   * assets
 
   """
-  @spec get_functions_of([String.t()] | Hash.t() | String.t()) :: map() | {:ok, [map()]}
-  def get_functions_of(hashes) when is_list(hashes) do
-    IO.inspect(1)
-    requests =
-      hashes
-      |> Enum.flat_map(fn hash ->
-        @contract_functions
-        |> Enum.map(fn {method_id, args} ->
-          %{contract_address: hash, method_id: method_id, args: args}
-        end)
-      end)
-
-    updated_at = DateTime.utc_now()
-
-    fetched_result =
-      requests
-      |> Reader.query_contracts(@contract_abi)
-      |> Enum.chunk_every(1)
-      |> Enum.zip(hashes)
-      |> Enum.map(fn {result, hash} ->
-        formatted_result =
-          ["asset_id"]
-          |> Enum.zip(result)
-          |> format_contract_functions_result(hash)
-
-        formatted_result
-        |> Map.put(:contract_address_hash, hash)
-        |> Map.put(:updated_at, updated_at)
-      end)
-
-    {:ok, fetched_result}
-  end
-
   def get_functions_of(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address) do
     address_string = Hash.to_string(address)
     get_functions_of(address_string)
@@ -104,56 +71,27 @@ defmodule Explorer.Registry.MapRetriever do
     end
   end
 
-  defp log_functions_with_errors(contract_address_hash, functions_with_errors, retries_left) do
-    error_messages =
-      Enum.map(functions_with_errors, fn {function, {:error, error_message}} ->
-        "function: #{function} - error: #{error_message} \n"
-      end)
-
-    Logger.debug(
-      [
-        "<Token contract hash: #{contract_address_hash}> error while fetching metadata: \n",
-        error_messages,
-        "Retries left: #{retries_left - 1}"
-      ],
-      fetcher: :token_functions
-    )
-  end
-
   defp format_contract_functions_result(contract_functions, contract_address_hash) do
     contract_functions =
       for {method_id, {:ok, [function_data]}} <- contract_functions, into: %{} do
+        
         if method_id === "f11b8188" do
-          {:ok, asset_id} = UUID.load(Base.decode16!(Integer.to_string(function_data, 16), case: :mixed))
-          {atomized_key(method_id), asset_id}
+          asset_string = Integer.to_string(function_data, 16)
+          case asset_string === "0" do
+            true -> 
+             {atomized_key(method_id), nil}
+            _ ->
+             asset_string = String.pad_leading(asset_string, 32, "0")
+             {:ok, asset_id} = UUID.load(Base.decode16!(asset_string, case: :mixed))
+             {atomized_key(method_id), asset_id}
+          end
         else 
           {atomized_key(method_id), function_data}
         end 
       end
 
     contract_functions
-    |> handle_invalid_strings(contract_address_hash)
-    |> handle_large_strings
   end
 
   defp atomized_key("f11b8188"), do: :asset_id
-
-  # It's a temp fix to store tokens that have names and/or symbols with characters that the database
-  # doesn't accept. See https://github.com/blockscout/blockscout/issues/669 for more info.
-  defp handle_invalid_strings(contract_functions, _contract_address_hash), do: contract_functions
-
-  defp format_according_contract_address_hash(contract_address_hash) do
-    String.slice(contract_address_hash, 0, 6)
-  end
-
-  defp handle_large_strings(contract_functions), do: contract_functions
-
-  defp handle_large_string(nil), do: nil
-  defp handle_large_string(string), do: handle_large_string(string, byte_size(string))
-  defp handle_large_string(string, size) when size > 255, do: binary_part(string, 0, 255)
-  defp handle_large_string(string, _size), do: string
-
-  defp remove_null_bytes(string) do
-    String.replace(string, "\0", "")
-  end
 end

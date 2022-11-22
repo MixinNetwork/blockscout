@@ -71,7 +71,7 @@ defmodule Indexer.Fetcher.Asset do
   defp update_token_asset_id(%Token{contract_address_hash: contract_address_hash, asset_id: old_asset_id} = token) do
     token_params = MapRetriever.get_functions_of(contract_address_hash)
 
-    if token_params.asset_id == old_asset_id do
+    if is_nil(token_params.asset_id) or token_params.asset_id == old_asset_id do
       :ok
     else
       {:ok, _} = Chain.update_token(%{token | updated_at: DateTime.utc_now()}, token_params)
