@@ -5,7 +5,7 @@ defmodule Explorer.Application do
 
   use Application
 
-  alias Explorer.Admin
+  alias Explorer.{Admin, TokenTransferTokenIdMigration}
 
   alias Explorer.Chain.Cache.{
     Accounts,
@@ -85,6 +85,10 @@ defmodule Explorer.Application do
       configure(Explorer.KnownTokens),
       configure(Explorer.Market.History.Cataloger),
       configure(Explorer.Chain.Cache.TokenExchangeRate),
+      configure(Explorer.Chain.Cache.ContractsCounter),
+      configure(Explorer.Chain.Cache.NewContractsCounter),
+      configure(Explorer.Chain.Cache.VerifiedContractsCounter),
+      configure(Explorer.Chain.Cache.NewVerifiedContractsCounter),
       configure(Explorer.Chain.Transaction.History.Historian),
       configure(Explorer.Chain.Events.Listener),
       configure(Explorer.Counters.AddressesWithBalanceCounter),
@@ -101,7 +105,8 @@ defmodule Explorer.Application do
       configure(Explorer.Counters.Bridge),
       configure(Explorer.Validator.MetadataProcessor),
       configure(Explorer.Tags.AddressTag.Cataloger),
-      configure(MinMissingBlockNumber)
+      configure(MinMissingBlockNumber),
+      configure(TokenTransferTokenIdMigration.Supervisor)
     ]
     |> List.flatten()
   end

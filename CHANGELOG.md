@@ -2,6 +2,12 @@
 
 ### Features
 
+- [#6444](https://github.com/blockscout/blockscout/pull/6444) - Add support for yul verification via rust microservice
+- [#6440](https://github.com/blockscout/blockscout/pull/6440) - Add support for base64 encoded NFT metadata
+- [#6407](https://github.com/blockscout/blockscout/pull/6407) - Indexed ratio for int txs fetching stage
+- [#6324](https://github.com/blockscout/blockscout/pull/6324) - Add verified contracts list page
+- [#6379](https://github.com/blockscout/blockscout/pull/6379) - API v2 for frontend
+- [#6351](https://github.com/blockscout/blockscout/pull/6351) - Enable forum link env var
 - [#6316](https://github.com/blockscout/blockscout/pull/6316) - Copy public tags functionality to master
 - [#6196](https://github.com/blockscout/blockscout/pull/6196) - INDEXER_CATCHUP_BLOCKS_BATCH_SIZE and INDEXER_CATCHUP_BLOCKS_CONCURRENCY env varaibles
 - [#6187](https://github.com/blockscout/blockscout/pull/6187) - Filter by created time of verified contracts in listcontracts API endpoint
@@ -11,9 +17,18 @@
 - [#6168](https://github.com/blockscout/blockscout/pull/6168) - Token instance fetcher checks instance owner and updates current token balance
 - [#6209](https://github.com/blockscout/blockscout/pull/6209) - Add metrics for block import stages, runners, steps
 - [#6257](https://github.com/blockscout/blockscout/pull/6257), [#6276](https://github.com/blockscout/blockscout/pull/6276) - DISABLE_TOKEN_INSTANCE_FETCHER env variable
+- [#6391](https://github.com/blockscout/blockscout/pull/6391), [#6427](https://github.com/blockscout/blockscout/pull/6427) - TokenTransfer token_id -> token_ids migration
+- [#6443](https://github.com/blockscout/blockscout/pull/6443) - Drop internal transactions order index
+- [#6450](https://github.com/blockscout/blockscout/pull/6450) - INDEXER_INTERNAL_TRANSACTIONS_BATCH_SIZE and INDEXER_INTERNAL_TRANSACTIONS_CONCURRENCY env variables
+- [#6454](https://github.com/blockscout/blockscout/pull/6454) - INDEXER_RECEIPTS_BATCH_SIZE, INDEXER_RECEIPTS_CONCURRENCY, INDEXER_COIN_BALANCES_BATCH_SIZE, INDEXER_COIN_BALANCES_CONCURRENCY env variables
+- [#6476](https://github.com/blockscout/blockscout/pull/6476) - Update token balances indexes
 
 ### Fixes
 
+- [#6475](https://github.com/blockscout/blockscout/pull/6475) - Fix token name with unicode graphemes shortening
+- [#6420](https://github.com/blockscout/blockscout/pull/6420) - Fix address logs search
+- [#6390](https://github.com/blockscout/blockscout/pull/6390) - Fix transactions responses in API v2
+- [#6357](https://github.com/blockscout/blockscout/pull/6357), [#6409](https://github.com/blockscout/blockscout/pull/6409), [#6428](https://github.com/blockscout/blockscout/pull/6428) - Fix definitions of NETWORK_PATH, API_PATH, SOCKET_ROOT: process trailing slash
 - [#6338](https://github.com/blockscout/blockscout/pull/6338) - Fix token search with space
 - [#6329](https://github.com/blockscout/blockscout/pull/6329) - Prevent logger from truncating response from rust verifier service in case of an error
 - [#6309](https://github.com/blockscout/blockscout/pull/6309) - Fix read contract bug and change address tx count
@@ -31,9 +46,12 @@
 - [#6223](https://github.com/blockscout/blockscout/pull/6223) - Fix coin_id test
 - [#6336](https://github.com/blockscout/blockscout/pull/6336) - Fix sending request on each key in token search
 - [#6327](https://github.com/blockscout/blockscout/pull/6327) - Fix and refactor address logs page and search
+- [#6449](https://github.com/blockscout/blockscout/pull/6449) - Search min_missing_block_number from zero
 
 ### Chore
 
+- [#6387](https://github.com/blockscout/blockscout/pull/6387) - Fix errors in docker-build and e2e-tests workflows
+- [#6325](https://github.com/blockscout/blockscout/pull/6325) - Set http_only attribute of account authorization cookie to false
 - [#6343](https://github.com/blockscout/blockscout/pull/6343) - Docker-compose persistent logs
 - [#6240](https://github.com/blockscout/blockscout/pull/6240) - Elixir 1.14 support
 - [#6204](https://github.com/blockscout/blockscout/pull/6204) - Refactor contract libs render, CONTRACT_VERIFICATION_MAX_LIBRARIES, refactor parsing integer env vars in config
@@ -126,6 +144,7 @@
 - [#5968](https://github.com/blockscout/blockscout/pull/5968) - Add call type in the response of txlistinternal API method
 - [#5860](https://github.com/blockscout/blockscout/pull/5860) - Integrate rust verifier micro-service ([blockscout-rs/verifier](https://github.com/blockscout/blockscout-rs/tree/main/verification))
 - [#6001](https://github.com/blockscout/blockscout/pull/6001) - Add ETHEREUM_JSONRPC_DISABLE_ARCHIVE_BALANCES env var that filters requests and query node only if the block quantity is "latest"
+- [#5944](https://github.com/blockscout/blockscout/pull/5944) - Add tab with state changes to transaction page
 
 ### Fixes
 
