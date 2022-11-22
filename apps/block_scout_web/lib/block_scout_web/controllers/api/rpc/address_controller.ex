@@ -246,12 +246,27 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
         "asset_id" => x.asset_id
       } end)
 
+      asset_map = %{}
+      res = MIXIN_API.request("/network/assets/top")
+      case res do
+        {:ok, top_assets} -> 
+          Enum.each(top_assets, fn x ->
+            Map.put(asset_map, x["asset_id"], x)
+          end)
+        {:error, _} -> :error
+      end
+
       final = Enum.map(merged, fn x ->
-        res = MIXIN_API.request("/network/assets/" <> x["asset_id"])
-        case res do
-          {:ok, asset} -> Map.merge(x, asset)
-          {:error, _} -> x
-        end 
+        is_in_top = Map.has_key?(asset_map, x["asset_id"])
+        if is_in_top do
+          Map.merge(x, Map.get(asset_map, x["asset_id"]))
+        else
+          res = MIXIN_API.request("/network/assets/" <> x["asset_id"])
+          case res do
+            {:ok, asset} -> Map.merge(x, asset)
+            {:error, _} -> x
+          end 
+        end
       end)
 
       render(conn, :assets, %{asset_list: final})
