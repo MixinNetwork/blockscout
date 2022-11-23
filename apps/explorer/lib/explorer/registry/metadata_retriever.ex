@@ -79,7 +79,7 @@ defmodule Explorer.Registry.MapRetriever do
           asset_string = Integer.to_string(function_data, 16)
           case asset_string === "0" do
             true -> 
-             {atomized_key(method_id), nil}
+             {atomized_key(method_id), asset_string}
             _ ->
              asset_string = String.pad_leading(asset_string, 32, "0")
              {:ok, asset_id} = UUID.load(Base.decode16!(asset_string, case: :mixed))

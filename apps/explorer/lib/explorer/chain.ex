@@ -4732,6 +4732,7 @@ defmodule Explorer.Chain do
       from(
         token in Token,
         where: token.type == "ERC-20",
+        where: is_nil(token.asset_id),
         select: token.contract_address_hash
       )
 
