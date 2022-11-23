@@ -238,7 +238,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       end)
       merged = Enum.map(token_list ++ default_assets, fn x -> %{
         "balance" => case Map.has_key?(x, :balance) do true -> to_string(x.balance); _ -> "0" end,
-        "contractAddress" => to_string(x.contract_address_hash),
+        "contract" => to_string(x.contract_address_hash),
         "name" => x.name,
         "decimals" => to_string(x.decimals),
         "symbol" => x.symbol,
