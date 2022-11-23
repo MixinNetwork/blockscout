@@ -272,10 +272,10 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       render(conn, :assets, %{asset_list: final})
     else
       {:address_param, :error} ->
-        render(conn, :error, error: "Query parameter address is required")
+        render(conn, :error, error: "Query parameter 'address' is required")
 
       {:format, :error} ->
-        render(conn, :error, error: "Invalid address format")
+        render(conn, :error, error: "Invalid address hash")
 
       {_, :not_found} ->
         render(conn, :error, error: "No tokens found", data: [])
