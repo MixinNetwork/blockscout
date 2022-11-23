@@ -15,9 +15,10 @@ defmodule Indexer.Fetcher.Asset do
   @behaviour BufferedTask
 
   @defaults [
-    flush_interval: 1000 * 60,
+    flush_interval: :timer.seconds(30),
     max_batch_size: 1,
     max_concurrency: 10,
+    poll: true,
     task_supervisor: Indexer.Fetcher.Asset.TaskSupervisor
   ]
 
@@ -68,14 +69,13 @@ defmodule Indexer.Fetcher.Asset do
     BufferedTask.buffer(__MODULE__, token_contract_addresses)
   end
 
-  defp update_token_asset_id(%Token{contract_address_hash: contract_address_hash, asset_id: old_asset_id} = token) do
+  defp update_token_asset_id(%Token{contract_address_hash: contract_address_hash} = token) do
     token_params = MapRetriever.get_functions_of(contract_address_hash)
 
-    if is_nil(token_params.asset_id) or token_params.asset_id == old_asset_id do
-      :ok
-    else
+    if not is_nil(token_params.asset_id) do
       {:ok, _} = Chain.update_token(%{token | updated_at: DateTime.utc_now()}, token_params)
-      :ok
     end
+
+    :ok
   end
 end

@@ -65,10 +65,44 @@ defmodule Explorer.Registry.MapRetriever do
       end)
 
     if Enum.any?(functions_with_errors) do
-      {:error, ""}   
+      log_functions_with_errors(contract_address_hash, functions_with_errors, retries_left)
+
+      contract_functions_with_errors =
+        Map.take(
+          contract_functions,
+          Enum.map(functions_with_errors, fn {function, _status} -> function end)
+        )
+
+      fetch_functions_with_retries(
+        contract_address_hash,
+        contract_functions_with_errors,
+        Map.merge(accumulator, contract_functions_result),
+        retries_left - 1
+      )
     else
-      contract_functions_result
+      fetch_functions_with_retries(
+        contract_address_hash,
+        %{},
+        Map.merge(accumulator, contract_functions_result),
+        0
+      )
     end
+  end
+
+  defp log_functions_with_errors(contract_address_hash, functions_with_errors, retries_left) do
+    error_messages =
+      Enum.map(functions_with_errors, fn {function, {:error, error_message}} ->
+        "function: #{function} - error: #{error_message} \n"
+      end)
+
+    Logger.debug(
+      [
+        "<Token contract hash: #{contract_address_hash}> error while fetching metadata: \n",
+        error_messages,
+        "Retries left: #{retries_left - 1}"
+      ],
+      fetcher: :token_functions
+    )
   end
 
   defp format_contract_functions_result(contract_functions, contract_address_hash) do
