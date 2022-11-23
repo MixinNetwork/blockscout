@@ -15,9 +15,10 @@ defmodule Indexer.Fetcher.Asset do
   @behaviour BufferedTask
 
   @defaults [
-    flush_interval: 1000 * 60,
+    flush_interval: :timer.seconds(30),
     max_batch_size: 1,
     max_concurrency: 10,
+    poll: true,
     task_supervisor: Indexer.Fetcher.Asset.TaskSupervisor
   ]
 
