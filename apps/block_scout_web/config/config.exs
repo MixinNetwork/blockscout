@@ -116,8 +116,8 @@ config :block_scout_web, BlockScoutWeb.API.RPC.AddressController,
     "0xe968257b324264858c0704fcd260d6673d7fe5cf", # EOS
     "0x034a771797a1c8694bc33e1aa89f51d1f828e5a4", # XIN
     "0xc39cb12df2ab413d4f3d1a2212a09bbf98ff650e", # TRX
-    "0x59e0f2e9254db4d662ef36a02118ec5dbd9f8dfb", # USDT
-    "0xac2ac36102f96f1fded2724f1d54b9fca6bbf1ee", # USDT
+    "0x59e0f2e9254db4d662ef36a02118ec5dbd9f8dfb", # USDT ERC20
+    "0xac2ac36102f96f1fded2724f1d54b9fca6bbf1ee", # USDT TRON
     "0x4c29a2ae22453cbfab915083ea9bcbff424cea4d", # DOGE
   ]
 
