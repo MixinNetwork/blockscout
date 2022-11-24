@@ -1,4 +1,8 @@
 defmodule Explorer.Token.Utils do
+  @moduledoc """
+  Common code for token and registry metadata_retriever
+  """
+
 
   alias Explorer.SmartContract.Reader
 
