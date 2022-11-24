@@ -237,12 +237,12 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       end)
       merged = Enum.map(token_list ++ default_assets, fn x -> %{
         "balance" => case Map.has_key?(x, :balance) do true -> to_string(x.balance); _ -> "0" end,
-        "contract" => to_string(x.contract_address_hash),
+        "contractAddress" => to_string(x.contract_address_hash),
+        "assetId" => x.asset_id,
         "name" => x.name,
         "decimals" => to_string(x.decimals),
         "symbol" => x.symbol,
-        "type" => x.type,
-        "asset_id" => x.asset_id
+        "type" => x.type
       } end)
 
       render(conn, :assets, %{asset_list: merged})
