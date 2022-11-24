@@ -284,6 +284,16 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
 
       {_, :not_found} ->
         render(conn, :error, error: "No tokens found", data: [])
+
+      {:block_param, :error} ->
+        conn
+        |> put_status(400)
+        |> render(:eth_get_balance_error, %{error: "Invalid block"})
+
+      {:balance, {:error, :not_found}} ->
+        conn
+        |> put_status(404)
+        |> render(:eth_get_balance_error, %{error: "Balance not found"})
     end
   end
 
