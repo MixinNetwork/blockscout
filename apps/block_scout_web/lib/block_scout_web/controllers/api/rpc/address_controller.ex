@@ -6,7 +6,6 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
   alias Explorer.Chain.{Address, Wei}
   alias Explorer.Etherscan.{Addresses, Blocks}
   alias Indexer.Fetcher.CoinBalanceOnDemand
-  alias BlockScoutWeb.MIXIN_API
 
   def listaccounts(conn, params) do
     options =
