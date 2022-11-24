@@ -42,7 +42,7 @@ defmodule Explorer.Registry.MapRetriever do
         "f11b8188" => [contract_address_hash]
       })
 
-    formatted_res = format_contract_functions_result(res, contract_address_hash)
+    formatted_res = format_contract_functions_result(res)
 
     formatted_res
   end
@@ -107,7 +107,7 @@ defmodule Explorer.Registry.MapRetriever do
     )
   end
 
-  defp format_contract_functions_result(contract_functions, contract_address_hash) do
+  defp format_contract_functions_result(contract_functions) do
     contract_functions =
       for {method_id, {:ok, [function_data]}} <- contract_functions, into: %{} do
         if method_id === "f11b8188" do
