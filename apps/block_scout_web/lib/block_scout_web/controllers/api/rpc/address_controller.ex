@@ -234,6 +234,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       user_assets_with_balance = Enum.map(token_list, fn x -> to_string(x.contract_address_hash) end)
 
       total_assets = Chain.list_top_tokens("")
+
       default_assets =
         Enum.filter(total_assets, fn x ->
           contract = to_string(x.contract_address_hash)
