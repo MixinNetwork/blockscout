@@ -1,6 +1,8 @@
 defmodule BlockScoutWeb.API.RPC.AddressController do
   use BlockScoutWeb, :controller
 
+  require Decimal
+
   alias BlockScoutWeb.API.RPC.Helpers
   alias Explorer.{Chain, Etherscan}
   alias Explorer.Chain.{Address, Wei}
@@ -225,6 +227,8 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
     with {:address_param, {:ok, address_param}} <- fetch_address(params),
          {:format, {:ok, address_hash}} <- to_address_hash(address_param),
          {:address, :ok} <- {:address, Chain.check_address_exists(address_hash)},
+         {:block_param, {:ok, block}} <- {:block_param, fetch_block_param(params)},
+         {:balance, {:ok, balance}} <- {:balance, Blocks.get_balance_as_of_block(address_hash, block)},
          {:ok, token_list} <- list_tokens(address_hash) do
       conf = Application.get_env(:block_scout_web, BlockScoutWeb.API.RPC.AddressController)
       mvm_default_assets = conf[:mvm_default_assets]
@@ -246,7 +250,18 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
         "asset_id" => x.asset_id
       } end)
 
-      render(conn, :assets, %{asset_list: merged})
+      merged = merged ++ [%{
+        "balance" => Decimal.to_string(balance.value),
+        "contract" => "",
+        "name" => "Ether",
+        "decimals" => "18",
+        "symbol" => "ETH",
+        "type" => "",
+        "asset_id" => "43d61dcd-e413-450d-80b8-101d5e903357"
+      }]
+   
+      final = Enum.sort_by(merged, fn x -> String.to_integer(x["balance"]) end, :desc) 
+      render(conn, :assets, %{asset_list: final})
     else
       {:address_param, :error} ->
         render(conn, :error, error: "Query parameter 'address' is required")
