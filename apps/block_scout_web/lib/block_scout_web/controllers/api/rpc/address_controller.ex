@@ -239,6 +239,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
         not Enum.member?(user_assets_with_balance, contract)
           and Enum.member?(mvm_default_assets, contract)
       end)
+
       merged = Enum.map(token_list ++ default_assets, fn x -> %{
         "balance" => case Map.has_key?(x, :balance) do true -> to_string(x.balance); _ -> "0" end,
         "contractAddress" => to_string(x.contract_address_hash),
@@ -251,12 +252,12 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
 
       merged = merged ++ [%{
         "balance" => Decimal.to_string(balance.value),
-        "contract" => "",
+        "contractAddress" => "",
+        "assetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
         "name" => "Ether",
         "decimals" => "18",
         "symbol" => "ETH",
         "type" => "",
-        "asset_id" => "43d61dcd-e413-450d-80b8-101d5e903357"
       }]
    
       final = Enum.sort_by(merged, fn x -> String.to_integer(x["balance"]) end, :desc) 
