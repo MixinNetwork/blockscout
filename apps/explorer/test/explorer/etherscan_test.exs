@@ -1612,6 +1612,7 @@ defmodule Explorer.EtherscanTest do
 
       expected_tokens = [
         %{
+          asset_id: nil,
           balance: token_balance.value,
           contract_address_hash: token_balance.token_contract_address_hash,
           name: token_balance.token.name,
