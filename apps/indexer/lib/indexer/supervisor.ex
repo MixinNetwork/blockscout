@@ -14,6 +14,7 @@ defmodule Indexer.Supervisor do
   alias Indexer.Block.{Catchup, Realtime}
 
   alias Indexer.Fetcher.{
+    Asset,
     BlockReward,
     CoinBalance,
     CoinBalanceOnDemand,
@@ -22,7 +23,6 @@ defmodule Indexer.Supervisor do
     InternalTransaction,
     PendingTransaction,
     ReplacedTransaction,
-    Asset,
     Token,
     TokenBalance,
     TokenInstance,

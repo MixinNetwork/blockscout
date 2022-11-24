@@ -42,9 +42,9 @@ defmodule Explorer.Registry.MapRetriever do
         "f11b8188" => [contract_address_hash]
       })
 
-    res = format_contract_functions_result(res, contract_address_hash)
+    formatted_res = format_contract_functions_result(res, contract_address_hash)
 
-    res
+    formatted_res
   end
 
   defp fetch_functions_from_contract(contract_address_hash, contract_functions) do

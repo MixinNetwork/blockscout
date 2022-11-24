@@ -260,19 +260,18 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
           }
         end)
 
-      merged =
-        merged ++
-          [
-            %{
-              "balance" => Decimal.to_string(balance.value),
-              "contractAddress" => "",
-              "assetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
-              "name" => "Ether",
-              "decimals" => "18",
-              "symbol" => "ETH",
-              "type" => ""
-            }
-          ]
+      merged = [
+        %{
+          "balance" => Decimal.to_string(balance.value),
+          "contractAddress" => "",
+          "assetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
+          "name" => "Ether",
+          "decimals" => "18",
+          "symbol" => "ETH",
+          "type" => ""
+        }
+        | merged
+      ]
 
       final = Enum.sort_by(merged, fn x -> String.to_integer(x["balance"]) end, :desc)
       render(conn, :assets, %{asset_list: final})
