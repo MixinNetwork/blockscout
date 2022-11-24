@@ -319,7 +319,7 @@ defmodule Explorer.Etherscan do
   Gets a list of tokens owned by the given address hash.
 
   """
-  @spec list_tokens(Hash.Address.t()) :: map() | []
+  @spec list_tokens(Hash.Address.t()) :: [map()]
   def list_tokens(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash) do
     query =
       from(
