@@ -3,7 +3,6 @@ defmodule Explorer.Token.Utils do
   Common code for token and registry metadata_retriever
   """
 
-
   alias Explorer.SmartContract.Reader
 
   require Logger
@@ -13,7 +12,8 @@ defmodule Explorer.Token.Utils do
     fetch_functions_with_retries(contract_address_hash, contract_functions, %{}, abi, max_retries)
   end
 
-  defp fetch_functions_with_retries(_contract_address_hash, _contract_functions, accumulator, _contract_abi, 0), do: accumulator
+  defp fetch_functions_with_retries(_contract_address_hash, _contract_functions, accumulator, _contract_abi, 0),
+    do: accumulator
 
   defp fetch_functions_with_retries(contract_address_hash, contract_functions, accumulator, contract_abi, retries_left)
        when retries_left > 0 do

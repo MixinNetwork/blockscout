@@ -6,7 +6,7 @@ defmodule Explorer.Token.MetadataRetriever do
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.{Hash, Token}
   alias Explorer.SmartContract.Reader
- 
+
   import Explorer.Token.Utils, only: [fetch_functions_from_contract: 3]
 
   @contract_abi [

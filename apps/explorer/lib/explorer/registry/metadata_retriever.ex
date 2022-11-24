@@ -5,7 +5,7 @@ defmodule Explorer.Registry.MapRetriever do
 
   alias Ecto.UUID
   alias Explorer.Chain.Hash
-  
+
   import Explorer.Token.Utils, only: [fetch_functions_from_contract: 3]
 
   @contract_abi [
@@ -37,9 +37,13 @@ defmodule Explorer.Registry.MapRetriever do
 
   def get_functions_of(contract_address_hash) when is_binary(contract_address_hash) do
     res =
-      fetch_functions_from_contract("0x3c84B6C98FBeB813e05a7A7813F0442883450B1F", %{
-        "f11b8188" => [contract_address_hash]
-      }, @contract_abi)
+      fetch_functions_from_contract(
+        "0x3c84B6C98FBeB813e05a7A7813F0442883450B1F",
+        %{
+          "f11b8188" => [contract_address_hash]
+        },
+        @contract_abi
+      )
 
     formatted_res = format_contract_functions_result(res)
 
