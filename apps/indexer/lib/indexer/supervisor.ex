@@ -19,6 +19,7 @@ defmodule Indexer.Supervisor do
     CoinBalance,
     CoinBalanceOnDemand,
     ContractCode,
+    ContractLog,
     EmptyBlocksSanitizer,
     InternalTransaction,
     PendingTransaction,
@@ -30,6 +31,7 @@ defmodule Indexer.Supervisor do
     TokenUpdater,
     UncleBlock
   }
+
 
   alias Indexer.Temporary.{
     BlocksTransactionsMismatch,
@@ -122,6 +124,8 @@ defmodule Indexer.Supervisor do
            [json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]
          ]},
         {ContractCode.Supervisor,
+         [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+        {ContractLog.Supervisor,
          [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
         {TokenBalance.Supervisor,
          [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
