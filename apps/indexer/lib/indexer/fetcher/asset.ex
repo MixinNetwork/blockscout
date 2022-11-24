@@ -5,7 +5,7 @@ defmodule Indexer.Fetcher.Asset do
 
   use Indexer.Fetcher
   use Spandex.Decorators
-  
+
   alias Explorer.Chain
   alias Explorer.Chain.Hash.Address
   alias Explorer.Chain.Token

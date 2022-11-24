@@ -234,33 +234,47 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       user_assets_with_balance = Enum.map(token_list, fn x -> to_string(x.contract_address_hash) end)
 
       total_assets = Chain.list_top_tokens(nil)
-      default_assets = Enum.filter(total_assets, fn x ->
-        contract = to_string(x.contract_address_hash)
-        not Enum.member?(user_assets_with_balance, contract)
-          and Enum.member?(mvm_default_assets, contract)
-      end)
 
-      merged = Enum.map(token_list ++ default_assets, fn x -> %{
-        "balance" => case Map.has_key?(x, :balance) do true -> to_string(x.balance); _ -> "0" end,
-        "contractAddress" => to_string(x.contract_address_hash),
-        "assetId" => x.asset_id,
-        "name" => x.name,
-        "decimals" => to_string(x.decimals),
-        "symbol" => x.symbol,
-        "type" => x.type
-      } end)
+      default_assets =
+        Enum.filter(total_assets, fn x ->
+          contract = to_string(x.contract_address_hash)
 
-      merged = merged ++ [%{
-        "balance" => Decimal.to_string(balance.value),
-        "contractAddress" => "",
-        "assetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
-        "name" => "Ether",
-        "decimals" => "18",
-        "symbol" => "ETH",
-        "type" => "",
-      }]
-   
-      final = Enum.sort_by(merged, fn x -> String.to_integer(x["balance"]) end, :desc) 
+          not Enum.member?(user_assets_with_balance, contract) and
+            Enum.member?(mvm_default_assets, contract)
+        end)
+
+      merged =
+        Enum.map(token_list ++ default_assets, fn x ->
+          %{
+            "balance" =>
+              case Map.has_key?(x, :balance) do
+                true -> to_string(x.balance)
+                _ -> "0"
+              end,
+            "contractAddress" => to_string(x.contract_address_hash),
+            "assetId" => x.asset_id,
+            "name" => x.name,
+            "decimals" => to_string(x.decimals),
+            "symbol" => x.symbol,
+            "type" => x.type
+          }
+        end)
+
+      merged =
+        merged ++
+          [
+            %{
+              "balance" => Decimal.to_string(balance.value),
+              "contractAddress" => "",
+              "assetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
+              "name" => "Ether",
+              "decimals" => "18",
+              "symbol" => "ETH",
+              "type" => ""
+            }
+          ]
+
+      final = Enum.sort_by(merged, fn x -> String.to_integer(x["balance"]) end, :desc)
       render(conn, :assets, %{asset_list: final})
     else
       {:address_param, :error} ->

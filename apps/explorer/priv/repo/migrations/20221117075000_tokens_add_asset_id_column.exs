@@ -3,7 +3,7 @@ defmodule Explorer.Repo.Migrations.TokensAddAssetIdColumn do
 
   def change do
     alter table("tokens") do
-      add :asset_id, :text
+      add(:asset_id, :text)
     end
   end
 end

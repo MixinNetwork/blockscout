@@ -22,7 +22,7 @@ defmodule Explorer.Registry.MapRetriever do
       ],
       "payable" => false,
       "type" => "function"
-    },
+    }
   ]
 
   @doc """
@@ -37,9 +37,11 @@ defmodule Explorer.Registry.MapRetriever do
   end
 
   def get_functions_of(contract_address_hash) when is_binary(contract_address_hash) do
-    res = fetch_functions_from_contract("0x3c84B6C98FBeB813e05a7A7813F0442883450B1F", %{
-      "f11b8188" => [contract_address_hash],
-    })
+    res =
+      fetch_functions_from_contract("0x3c84B6C98FBeB813e05a7A7813F0442883450B1F", %{
+        "f11b8188" => [contract_address_hash]
+      })
+
     res = format_contract_functions_result(res, contract_address_hash)
 
     res
@@ -108,20 +110,21 @@ defmodule Explorer.Registry.MapRetriever do
   defp format_contract_functions_result(contract_functions, contract_address_hash) do
     contract_functions =
       for {method_id, {:ok, [function_data]}} <- contract_functions, into: %{} do
-        
         if method_id === "f11b8188" do
           asset_string = Integer.to_string(function_data, 16)
+
           case asset_string === "0" do
-            true -> 
-             {atomized_key(method_id), asset_string}
+            true ->
+              {atomized_key(method_id), asset_string}
+
             _ ->
-             asset_string = String.pad_leading(asset_string, 32, "0")
-             {:ok, asset_id} = UUID.load(Base.decode16!(asset_string, case: :mixed))
-             {atomized_key(method_id), asset_id}
+              asset_string = String.pad_leading(asset_string, 32, "0")
+              {:ok, asset_id} = UUID.load(Base.decode16!(asset_string, case: :mixed))
+              {atomized_key(method_id), asset_id}
           end
-        else 
+        else
           {atomized_key(method_id), function_data}
-        end 
+        end
       end
 
     contract_functions
