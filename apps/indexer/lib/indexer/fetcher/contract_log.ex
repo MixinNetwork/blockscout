@@ -35,8 +35,8 @@ defmodule Indexer.Fetcher.ContractLog do
   def child_spec([init_options, gen_server_options]) do
     :ets.new(:log, [:named_table, :set, :public])
     # first CreateAsset
-    :ets.insert(:log, {"block_number", 1880820}) 
-    :ets.insert(:log, {"interval", 100000})
+    :ets.insert(:log, {"block_number", 1_880_820})
+    :ets.insert(:log, {"interval", 100_000})
 
     {state, mergeable_init_options} = Keyword.pop(init_options, :json_rpc_named_arguments)
 
@@ -93,19 +93,22 @@ defmodule Indexer.Fetcher.ContractLog do
         "method" => "eth_blockNumber",
         "params" => []
       })
+
     block_result = RPC.json_rpc(url, body, [])
+
     if {:ok, %{body: body}} = block_result do
       data = Jason.decode!(body)["result"]
-      latest = String.to_integer(String.slice(data, 2..-1), 16)  
+      latest = String.to_integer(String.slice(data, 2..-1), 16)
 
       interval = read_cache("interval")
 
       if start + interval > latest do
         :ets.insert(:log, {"interval", latest - start})
       end
-    end 
+    end
 
     interval = read_cache("interval")
+
     current_filter =
       filter
       |> Map.put("fromBlock", "0x" <> Integer.to_string(start, 16))
@@ -120,6 +123,7 @@ defmodule Indexer.Fetcher.ContractLog do
       })
 
     res = RPC.json_rpc(url, body, [])
+
     case res do
       {:ok, %{body: body}} ->
         data = Jason.decode!(body)["result"]

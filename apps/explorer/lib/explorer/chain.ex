@@ -1669,7 +1669,6 @@ defmodule Explorer.Chain do
     end
   end
 
-
   @spec search_contract(String.t()) :: [SmartContract.t()]
   def search_contract(string) do
     case prepare_search_term(string) do
