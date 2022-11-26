@@ -17,6 +17,11 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
     RPCView.render("show.json", data: data)
   end
 
+  def render("search.json", %{list: asset_list}) do
+    data = Enum.map(asset_list, &prepare_token/1)
+    RPCView.render("show.json", data: data)
+  end
+
   def render("error.json", assigns) do
     RPCView.render("error.json", assigns)
   end
@@ -29,7 +34,6 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
       "totalSupply" => to_string(token.total_supply),
       "decimals" => to_string(token.decimals),
       "contractAddress" => to_string(token.contract_address_hash),
-      "cataloged" => token.cataloged,
       "assetId" => token.asset_id
     }
   end

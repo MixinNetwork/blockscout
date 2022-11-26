@@ -56,6 +56,11 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
     render(conn, :total_assets, %{asset_list: erc20_assets})
   end
 
+  def search(conn, %{"q" => query} = _params) do
+    res = Chain.search_token_asset(query)
+    render(conn, :search, %{list: res})
+  end
+
   defp fetch_contractaddress(params) do
     {:contractaddress_param, Map.fetch(params, "contractaddress")}
   end
