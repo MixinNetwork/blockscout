@@ -6,11 +6,12 @@ defmodule Indexer.Fetcher.ContractLog do
   use Indexer.Fetcher
   use Spandex.Decorators
 
+  alias Ecto
   alias Ecto.UUID
+  alias EthereumJSONRPC.HTTP.HTTPoison, as: RPC
   alias Explorer.Chain
   alias Explorer.Chain.Hash.Address
   alias Explorer.Chain.Token
-  alias EthereumJSONRPC.HTTP.HTTPoison, as: RPC
   alias Explorer.Token.MetadataRetriever
   alias Indexer.{BufferedTask, Tracer}
 
@@ -86,7 +87,7 @@ defmodule Indexer.Fetcher.ContractLog do
     url = Application.get_env(:block_scout_web, :json_rpc)
     start = read_cache("block_number")
 
-    body =
+    block_body =
       Jason.encode!(%{
         "id" => "0",
         "jsonrpc" => "2.0",
@@ -94,17 +95,23 @@ defmodule Indexer.Fetcher.ContractLog do
         "params" => []
       })
 
-    block_result = RPC.json_rpc(url, body, [])
+    block_result = RPC.json_rpc(url, block_body, [])
 
-    if {:ok, %{body: body}} = block_result do
-      data = Jason.decode!(body)["result"]
-      latest = String.to_integer(String.slice(data, 2..-1), 16)
+    case block_result do
+      {:ok, %{body: body}} ->
+        data = Jason.decode!(body)["result"]
+        latest = String.to_integer(String.slice(data, 2..-1), 16)
 
-      interval = read_cache("interval")
+        interval = read_cache("interval")
 
-      if start + interval > latest do
-        :ets.insert(:log, {"interval", latest - start})
-      end
+        if start + interval > latest do
+          :ets.insert(:log, {"interval", latest - start})
+        end
+
+        :ok
+
+      _ ->
+        :ok
     end
 
     interval = read_cache("interval")
@@ -154,9 +161,13 @@ defmodule Indexer.Fetcher.ContractLog do
                   :type => "ERC-20"
                 }
 
-                Chain.create_address(%{
-                  :hash => address_string
-                })
+                try do
+                  Chain.create_address(%{
+                    :hash => address_string
+                  })
+                rescue
+                  Ecto.ConstraintError -> nil
+                end
 
                 Chain.update_token(token, %{})
             end
