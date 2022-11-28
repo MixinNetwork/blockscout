@@ -10,12 +10,11 @@ defmodule Indexer.Fetcher.ContractLog do
   alias Ecto
   alias Ecto.UUID
   alias EthereumJSONRPC.HTTP.HTTPoison, as: RPC
-  alias Explorer.Chain
+  alias Explorer.{Chain, Repo}
+  alias Explorer.Chain.Address, as: ChainAddress
   alias Explorer.Chain.Hash.Address
   alias Explorer.Chain.Token
-  alias Explorer.Chain.Address, as: ChainAddress
   alias Explorer.Token.MetadataRetriever
-  alias Explorer.Repo
   alias Indexer.{BufferedTask, Tracer}
 
   @behaviour BufferedTask
