@@ -2,6 +2,7 @@ defmodule Indexer.Fetcher.ContractLog do
   @moduledoc """
   Fetches information about tx logs.
   """
+  @dialyzer {:nowarn_function, loop_contract_logs: 1}
 
   use Indexer.Fetcher
   use Spandex.Decorators
@@ -12,7 +13,9 @@ defmodule Indexer.Fetcher.ContractLog do
   alias Explorer.Chain
   alias Explorer.Chain.Hash.Address
   alias Explorer.Chain.Token
+  alias Explorer.Chain.Address, as: ChainAddress
   alias Explorer.Token.MetadataRetriever
+  alias Explorer.Repo
   alias Indexer.{BufferedTask, Tracer}
 
   @behaviour BufferedTask
@@ -147,29 +150,28 @@ defmodule Indexer.Fetcher.ContractLog do
                 })
 
               {:error, _} ->
-                params = MetadataRetriever.get_functions_of(addr)
+                params =
+                  addr
+                  |> MetadataRetriever.get_functions_of()
+                  |> Map.put(:asset_id, uuid)
+                  |> Map.put(:type, "ERC-20")
+                  |> Map.put(:inserted_at, DateTime.utc_now())
+                  |> Map.put(:updated_at, DateTime.utc_now())
 
-                token = %Token{
-                  :name => params.name,
-                  :symbol => params.symbol,
-                  :decimals => params.decimals,
-                  :total_supply => params.total_supply,
-                  :contract_address_hash => addr,
-                  :asset_id => uuid,
-                  :inserted_at => DateTime.utc_now(),
-                  :updated_at => DateTime.utc_now(),
-                  :type => "ERC-20"
-                }
+                a = Repo.get(ChainAddress, addr)
 
-                try do
+                if is_nil(a) do
                   Chain.create_address(%{
                     :hash => address_string
                   })
-                rescue
-                  Ecto.ConstraintError -> nil
                 end
 
-                Chain.update_token(token, %{})
+                Chain.update_token(
+                  %Token{
+                    contract_address_hash: addr
+                  },
+                  params
+                )
             end
           else
             {:error, _} -> :ok
