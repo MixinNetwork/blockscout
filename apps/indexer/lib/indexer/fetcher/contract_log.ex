@@ -70,7 +70,7 @@ defmodule Indexer.Fetcher.ContractLog do
   end
 
   @impl BufferedTask
-  @decorate trace(name: "fetch", resource: "Indexer.Fetcher.Token.run/2", service: :indexer, tracer: Tracer)
+  @decorate trace(name: "fetch", resource: "Indexer.Fetcher.ContractLog.run/2", service: :indexer, tracer: Tracer)
   def run([adr], _json_rpc_named_arguments) do
     loop_contract_logs(@contract_logs_filter[adr])
   end
