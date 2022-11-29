@@ -3017,7 +3017,10 @@ defmodule Explorer.Chain do
         select: last_fetched_counter.value
       )
 
-    Repo.one!(query) || Decimal.new(0)
+    case Repo.exists?(query) do
+      true -> Repo.one!(query)
+      false -> Decimal.new(0)
+    end
   end
 
   defp block_status({number, timestamp}) do

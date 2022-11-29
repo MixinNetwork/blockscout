@@ -4,6 +4,8 @@ defmodule Indexer.Fetcher.ContractLog do
   """
   @dialyzer {:nowarn_function, loop_contract_logs: 1}
 
+  require Decimal
+
   use Indexer.Fetcher
   use Spandex.Decorators
 
@@ -34,11 +36,11 @@ defmodule Indexer.Fetcher.ContractLog do
     }
   }
 
+  @first_create_asset_block 1_880_820
+
   @doc false
   def child_spec([init_options, gen_server_options]) do
     :ets.new(:log, [:named_table, :set, :public])
-    # first CreateAsset
-    :ets.insert(:log, {"block_number", 1_880_820})
     :ets.insert(:log, {"interval", 100_000})
 
     {state, mergeable_init_options} = Keyword.pop(init_options, :json_rpc_named_arguments)
@@ -85,9 +87,18 @@ defmodule Indexer.Fetcher.ContractLog do
     elem(hd(cache), 1)
   end
 
+  defp get_last_block_number do
+    b = Chain.get_last_fetched_counter("asset_counter")
+
+    case Decimal.compare(b, Decimal.new(0)) do
+      :eq -> @first_create_asset_block
+      _ -> Decimal.to_integer(b)
+    end
+  end
+
   defp loop_contract_logs(filter) do
     url = Application.get_env(:block_scout_web, :json_rpc)
-    start = read_cache("block_number")
+    start = get_last_block_number()
 
     block_body =
       Jason.encode!(%{
@@ -177,7 +188,11 @@ defmodule Indexer.Fetcher.ContractLog do
           end
         end)
 
-        :ets.insert(:log, {"block_number", start + interval})
+        Chain.upsert_last_fetched_counter(%{
+          counter_type: "asset_counter",
+          value: start + interval
+        })
+
         :ok
 
       {:error, _} ->
