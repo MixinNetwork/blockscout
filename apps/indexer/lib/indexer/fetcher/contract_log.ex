@@ -29,10 +29,13 @@ defmodule Indexer.Fetcher.ContractLog do
     task_supervisor: Indexer.Fetcher.ContractLog.TaskSupervisor
   ]
 
+  @registry_contract "0x3c84b6c98fbeb813e05a7a7813f0442883450b1f"
+  @create_asset_topic "0x20df459a0f7f1bc64a42346a9e6536111a3512be01de7a0f5327a4e13b337038"
+
   @contract_logs_filter %{
-    "0x3c84b6c98fbeb813e05a7a7813f0442883450b1f" => %{
-      "address" => "0x3c84b6c98fbeb813e05a7a7813f0442883450b1f",
-      "topics" => ["0x20df459a0f7f1bc64a42346a9e6536111a3512be01de7a0f5327a4e13b337038"]
+    @registry_contract => %{
+      "address" => @registry_contract,
+      "topics" => [@create_asset_topic]
     }
   }
 
@@ -61,7 +64,7 @@ defmodule Indexer.Fetcher.ContractLog do
 
   @impl BufferedTask
   def init(initial_acc, reducer, _) do
-    contracts = ["0x3c84b6c98fbeb813e05a7a7813f0442883450b1f"]
+    contracts = [@registry_contract]
 
     acc =
       Enum.reduce(contracts, initial_acc, fn adr, acc ->
