@@ -159,14 +159,14 @@ defmodule Indexer.Fetcher.ContractLog do
             case Chain.token_from_address_hash(addr) do
               {:ok, token} ->
                 Chain.update_token(%{token | updated_at: DateTime.utc_now()}, %{
-                  :asset_id => uuid
+                  :mixin_asset_id => uuid
                 })
 
               {:error, _} ->
                 params =
                   addr
                   |> MetadataRetriever.get_functions_of()
-                  |> Map.put(:asset_id, uuid)
+                  |> Map.put(:mixin_asset_id, uuid)
                   |> Map.put(:type, "ERC-20")
                   |> Map.put(:inserted_at, DateTime.utc_now())
                   |> Map.put(:updated_at, DateTime.utc_now())

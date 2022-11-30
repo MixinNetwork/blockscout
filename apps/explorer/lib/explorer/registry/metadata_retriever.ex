@@ -62,8 +62,8 @@ defmodule Explorer.Registry.MapRetriever do
 
             _ ->
               asset_string = String.pad_leading(asset_string, 32, "0")
-              {:ok, asset_id} = UUID.load(Base.decode16!(asset_string, case: :mixed))
-              {atomized_key(method_id), asset_id}
+              {:ok, mixin_asset_id} = UUID.load(Base.decode16!(asset_string, case: :mixed))
+              {atomized_key(method_id), mixin_asset_id}
           end
         else
           {atomized_key(method_id), function_data}
@@ -73,5 +73,5 @@ defmodule Explorer.Registry.MapRetriever do
     contract_functions
   end
 
-  defp atomized_key("f11b8188"), do: :asset_id
+  defp atomized_key("f11b8188"), do: :mixin_asset_id
 end

@@ -252,7 +252,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
                 _ -> "0"
               end,
             "contractAddress" => to_string(x.contract_address_hash),
-            "assetId" => x.asset_id,
+            "mixinAssetId" => x.mixin_asset_id,
             "name" => x.name,
             "decimals" => to_string(x.decimals),
             "symbol" => x.symbol,
@@ -264,7 +264,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
         %{
           "balance" => Decimal.to_string(balance.value),
           "contractAddress" => "",
-          "assetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
+          "mixinAssetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
           "name" => "Ether",
           "decimals" => "18",
           "symbol" => "ETH",

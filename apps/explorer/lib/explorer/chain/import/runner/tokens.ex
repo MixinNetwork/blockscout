@@ -213,12 +213,12 @@ defmodule Explorer.Chain.Import.Runner.Tokens do
           # Don't update `contract_address_hash` as it is the primary key and used for the conflict target
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", token.inserted_at),
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", token.updated_at),
-          asset_id: fragment("EXCLUDED.asset_id")
+          mixin_asset_id: fragment("EXCLUDED.mixin_asset_id")
         ]
       ],
       where:
         fragment(
-          "(EXCLUDED.name, EXCLUDED.symbol, EXCLUDED.total_supply, EXCLUDED.decimals, EXCLUDED.type, EXCLUDED.cataloged, EXCLUDED.skip_metadata, EXCLUDED.asset_id) IS DISTINCT FROM (?, ?, ?, ?, ?, ?, ?, ?)",
+          "(EXCLUDED.name, EXCLUDED.symbol, EXCLUDED.total_supply, EXCLUDED.decimals, EXCLUDED.type, EXCLUDED.cataloged, EXCLUDED.skip_metadata, EXCLUDED.mixin_asset_id) IS DISTINCT FROM (?, ?, ?, ?, ?, ?, ?, ?)",
           token.name,
           token.symbol,
           token.total_supply,
@@ -226,7 +226,7 @@ defmodule Explorer.Chain.Import.Runner.Tokens do
           token.type,
           token.cataloged,
           token.skip_metadata,
-          token.asset_id
+          token.mixin_asset_id
         )
     )
   end

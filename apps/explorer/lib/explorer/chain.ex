@@ -1656,7 +1656,7 @@ defmodule Explorer.Chain do
               contract_address_hash: token.contract_address_hash,
               decimals: token.decimals,
               type: token.type,
-              asset_id: token.asset_id,
+              mixin_asset_id: token.mixin_asset_id,
               total_supply: token.total_supply
             },
             order_by: [desc: token.holder_count]
