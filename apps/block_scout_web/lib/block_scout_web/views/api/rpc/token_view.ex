@@ -12,7 +12,7 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
     RPCView.render("show.json", data: data)
   end
 
-  def render("total_assets.json", %{asset_list: asset_list}) do
+  def render("getmixinassets.json", %{asset_list: asset_list}) do
     data = Enum.map(asset_list, &prepare_token/1)
     RPCView.render("show.json", data: data)
   end

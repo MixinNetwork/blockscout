@@ -50,10 +50,10 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
     end
   end
 
-  def total_assets(conn, _params) do
+  def getmixinassets(conn, _params) do
     total_assets = Chain.list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})
     erc20_assets = Enum.filter(total_assets, fn x -> x.type == "ERC-20" and not is_nil(x.mixin_asset_id) end)
-    render(conn, :total_assets, %{asset_list: erc20_assets})
+    render(conn, :getmixinassets, %{asset_list: erc20_assets})
   end
 
   def search(conn, %{"q" => query} = _params) do

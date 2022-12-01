@@ -2082,8 +2082,8 @@ defmodule BlockScoutWeb.Etherscan do
     ]
   }
 
-  @token_total_assets_action %{
-    name: "total_assets",
+  @token_getmixinassets_action %{
+    name: "getMixinAssets",
     description:
       "Get all <a href='https://github.com/ethereum/EIPs/issues/20'>ERC-20</a> tokens with mixinAssetId",
     required_params: [],
@@ -3085,7 +3085,7 @@ defmodule BlockScoutWeb.Etherscan do
     actions: [
       @token_gettoken_action,
       @token_gettokenholders_action,
-      @token_total_assets_action,
+      @token_getmixinassets_action,
       @token_search_action
     ]
   }
