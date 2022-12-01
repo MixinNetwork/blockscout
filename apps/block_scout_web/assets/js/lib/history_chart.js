@@ -201,8 +201,8 @@ class MarketHistoryChart {
   constructor (el, availableSupply, _marketHistoryData, dataConfig) {
     const axes = config.options.scales
 
-    let priceActivated = true
-    let marketCapActivated = true
+    // let priceActivated = true
+    // let marketCapActivated = true
 
     this.price = {
       label: window.localized.Price,
@@ -215,11 +215,11 @@ class MarketHistoryChart {
       borderColor: priceLineColor
       // lineTension: 0
     }
-    //if (dataConfig.market === undefined || dataConfig.market.indexOf('price') === -1) {
-      this.price.hidden = true
-      axes.price.display = false
-      priceActivated = false
-    //}
+    // if (dataConfig.market === undefined || dataConfig.market.indexOf('price') === -1) {
+    this.price.hidden = true
+    axes.price.display = false
+    // priceActivated = false
+    // }
 
     this.marketCap = {
       label: window.localized['Market Cap'],
@@ -232,13 +232,13 @@ class MarketHistoryChart {
       borderColor: mcapLineColor
       // lineTension: 0
     }
-    //if (dataConfig.market === undefined || dataConfig.market.indexOf('market_cap') === -1) {
-      this.marketCap.hidden = true
-      axes.marketCap.display = false
-      this.price.hidden = true
-      axes.price.display = false
-      marketCapActivated = false
-    //}
+    // if (dataConfig.market === undefined || dataConfig.market.indexOf('market_cap') === -1) {
+    this.marketCap.hidden = true
+    axes.marketCap.display = false
+    this.price.hidden = true
+    axes.price.display = false
+    // marketCapActivated = false
+    // }
 
     this.numTransactions = {
       label: window.localized['Tx/day'],
@@ -255,9 +255,9 @@ class MarketHistoryChart {
     if (dataConfig.transactions === undefined || dataConfig.transactions.indexOf('transactions_per_day') === -1) {
       this.numTransactions.hidden = true
       axes.numTransactions.display = false
-    } else if (!priceActivated && !marketCapActivated) {
-      //axes.numTransactions.position = 'left'
-    }
+    } // else if (!priceActivated && !marketCapActivated) {
+    // axes.numTransactions.position = 'left'
+    // }
 
     this.availableSupply = availableSupply
 

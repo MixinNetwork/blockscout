@@ -6,7 +6,7 @@ export async function addChainToMM ({ btn }) {
     const chainIDFromInstance = getChainIdHex()
 
     const coinName = document.getElementById('js-coin-name').value
-    const subNetwork = document.getElementById('js-subnetwork').value
+    // const subNetwork = document.getElementById('js-subnetwork').value
     const jsonRPC = document.getElementById('js-json-rpc').value
 
     const blockscoutURL = location.protocol + '//' + location.host + process.env.NETWORK_PATH
