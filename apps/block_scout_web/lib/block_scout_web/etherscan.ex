@@ -296,6 +296,22 @@ defmodule BlockScoutWeb.Etherscan do
     "result" => nil
   }
 
+  @token_assets_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => [
+      %{
+        "contractAddress" => "0x0000000000000000000000000000000000000000",
+        "decimals" => "18",
+        "name" => "Example Token",
+        "symbol" => "ET",
+        "totalSupply" => "1000000000",
+        "type" => "ERC-20",
+        "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0"
+      }
+    ]
+  }
+
   @stats_tokensupply_example_value %{
     "status" => "1",
     "message" => "OK",
@@ -965,12 +981,8 @@ defmodule BlockScoutWeb.Etherscan do
         enum: ~s(["ERC-20", "ERC-721"]),
         enum_interpretation: %{"ERC-20" => "ERC-20 token standard", "ERC-721" => "ERC-721 token standard"}
       },
-      cataloged: %{
-        type: "boolean",
-        definition: "Flag for if token information has been cataloged.",
-        example: ~s(true)
-      },
-      contractAddress: @address_hash_type
+      contractAddress: @address_hash_type,
+      mixinAssetId: @mixin_asset_id_type
     }
   }
 
@@ -2070,6 +2082,65 @@ defmodule BlockScoutWeb.Etherscan do
     ]
   }
 
+  @token_total_assets_action %{
+    name: "total_assets",
+    description:
+      "Get all <a href='https://github.com/ethereum/EIPs/issues/20'>ERC-20</a> tokens with mixinAssetId",
+    required_params: [],
+    optional_params: [],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@token_assets_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @token_model
+            }
+          }
+        }
+      }
+    ]
+  }
+
+  @token_search_action %{
+    name: "search",
+    description:
+      "Search tokens with keyword",
+    required_params: [
+      %{
+        key: "q",
+        placeholder: "keyword",
+        type: "string",
+        description: "A keyword of name or symbol to search related tokens."
+      }
+    ],
+    optional_params: [],
+    responses: [
+      %{
+        code: "200", 
+        description: "successful operation",
+        example_value: Jason.encode!(@token_assets_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @token_model
+            }
+          }
+        }
+      }
+    ]
+  }
+
   @stats_tokensupply_action %{
     name: "tokensupply",
     description:
@@ -3013,7 +3084,9 @@ defmodule BlockScoutWeb.Etherscan do
     name: "token",
     actions: [
       @token_gettoken_action,
-      @token_gettokenholders_action
+      @token_gettokenholders_action,
+      @token_total_assets_action,
+      @token_search_action
     ]
   }
 
