@@ -20,6 +20,8 @@ config :logger, :block_scout_web,
 # Configure wallaby
 config :wallaby, screenshot_on_failure: true, driver: Wallaby.Chrome, js_errors: false
 
+config :block_scout_web, BlockScoutWeb.Chain, logo_footer: System.get_env("LOGO_FOOTER")
+
 config :block_scout_web, BlockScoutWeb.Counters.BlocksIndexedCounter, enabled: false
 
 config :block_scout_web, BlockScoutWeb.Counters.InternalTransactionsIndexedCounter, enabled: false
