@@ -1754,7 +1754,8 @@ defmodule BlockScoutWeb.Etherscan do
 
   @account_assets_action %{
     name: "assets",
-    description: "Get list of default assets and assets owned by address. BTC, EOS, ETH, MOB and USDT(ERC-20) are included in default assets currently.",
+    description:
+      "Get list of default assets and assets owned by address. BTC, EOS, ETH, MOB and USDT(ERC-20) are included in default assets currently.",
     required_params: [
       %{
         key: "address",
@@ -2084,8 +2085,7 @@ defmodule BlockScoutWeb.Etherscan do
 
   @token_getmixinassets_action %{
     name: "getMixinAssets",
-    description:
-      "Get all <a href='https://github.com/ethereum/EIPs/issues/20'>ERC-20</a> tokens with mixinAssetId",
+    description: "Get all <a href='https://github.com/ethereum/EIPs/issues/20'>ERC-20</a> tokens with mixinAssetId",
     required_params: [],
     optional_params: [],
     responses: [
@@ -2110,8 +2110,7 @@ defmodule BlockScoutWeb.Etherscan do
 
   @token_search_action %{
     name: "search",
-    description:
-      "Search tokens with keyword",
+    description: "Search tokens with keyword",
     required_params: [
       %{
         key: "q",
@@ -2123,7 +2122,7 @@ defmodule BlockScoutWeb.Etherscan do
     optional_params: [],
     responses: [
       %{
-        code: "200", 
+        code: "200",
         description: "successful operation",
         example_value: Jason.encode!(@token_assets_example_value),
         model: %{
