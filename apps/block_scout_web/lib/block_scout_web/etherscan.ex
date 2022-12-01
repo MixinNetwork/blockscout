@@ -186,7 +186,8 @@ defmodule BlockScoutWeb.Etherscan do
         "name" => "Example Token",
         "decimals" => "18",
         "symbol" => "ET",
-        "type" => "ERC-20"
+        "type" => "ERC-20",
+        "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0"
       },
       %{
         "balance" => "1",
@@ -194,7 +195,8 @@ defmodule BlockScoutWeb.Etherscan do
         "name" => "Example ERC-721 Token",
         "decimals" => "18",
         "symbol" => "ET7",
-        "type" => "ERC-721"
+        "type" => "ERC-721",
+        "mixinAssetId" => "78470287-4b6d-4aa0-82f9-e4e90a2ef2e3"
       }
     ]
   }
@@ -632,6 +634,12 @@ defmodule BlockScoutWeb.Etherscan do
     example: ~s("0x95426f2bc716022fcf1def006dbc4bb81f5b5164")
   }
 
+  @mixin_asset_id_type %{
+    type: "uuid",
+    definition: "Asset's corresponding uuid in Mixin Network.",
+    example: ~s("3c6be09f-fe6c-4a33-a60c-543f216cd9e0")
+  }
+
   @stale_type %{
     type: "boolean",
     definition:
@@ -978,6 +986,22 @@ defmodule BlockScoutWeb.Etherscan do
       symbol: @token_symbol_type,
       decimals: @token_decimal_type,
       contractAddress: @address_hash_type
+    }
+  }
+
+  @asset_model %{
+    name: "Asset",
+    fields: %{
+      balance: %{
+        type: "integer",
+        definition: "The token account balance.",
+        example: ~s("135499")
+      },
+      name: @token_name_type,
+      symbol: @token_symbol_type,
+      decimals: @token_decimal_type,
+      contractAddress: @address_hash_type,
+      mixinAssetId: @mixin_asset_id_type
     }
   }
 
@@ -1704,6 +1728,43 @@ defmodule BlockScoutWeb.Etherscan do
             result: %{
               type: "array",
               array_type: @token_balance_model
+            }
+          }
+        }
+      },
+      %{
+        code: "200",
+        description: "error",
+        example_value: Jason.encode!(@account_tokenbalance_example_value_error)
+      }
+    ]
+  }
+
+  @account_assets_action %{
+    name: "assets",
+    description: "Get list of default assets and assets owned by address. BTC, EOS, ETH, MOB and USDT(ERC-20) are included in default assets currently.",
+    required_params: [
+      %{
+        key: "address",
+        placeholder: "addressHash",
+        type: "string",
+        description: "A 160-bit code used for identifying accounts."
+      }
+    ],
+    optional_params: [],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@account_tokenlist_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "array",
+              array_type: @asset_model
             }
           }
         }
@@ -2937,6 +2998,7 @@ defmodule BlockScoutWeb.Etherscan do
       @account_tokentx_action,
       @account_tokenbalance_action,
       @account_tokenlist_action,
+      @account_assets_action,
       @account_getminedblocks_action,
       @account_listaccounts_action
     ]
