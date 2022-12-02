@@ -8,9 +8,11 @@
       <!-- Logo -->
       <div class=" footer-logo-row">
       <div class="">
-      <a class="footer-brand" href="https://scan.mvm.dev">
-      <img class="footer-logo" src="<%= static_path(@conn, logo_footer()) %>" alt="<%= subnetwork_title() %>" />
-      </a>
+        <a class="footer-brand" href="https://scan.mvm.dev">
+          <%= if logo_footer() do %>
+            <img class="footer-logo" src="<%= static_path(@conn, logo_footer()) %>" alt="<%= subnetwork_title() %>" />
+          <% end %>
+        </a>
       </div>
       </div>
 
