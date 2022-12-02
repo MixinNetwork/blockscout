@@ -34,7 +34,7 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
       "totalSupply" => to_string(token.total_supply),
       "decimals" => to_string(token.decimals),
       "contractAddress" => to_string(token.contract_address_hash),
-      "mixinAssetId" => token.mixin_asset_id
+      "mixinAssetId" => if(is_nil(token.mixin_asset_id), do: "", else: token.mixin_asset_id)
     }
   end
 

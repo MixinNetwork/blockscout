@@ -71,7 +71,7 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
         "decimals" => to_string(token.decimals),
         "type" => token.type,
         "contractAddress" => to_string(token.contract_address_hash),
-        "mixinAssetId" => nil
+        "mixinAssetId" => ""
       }
 
       assert response =

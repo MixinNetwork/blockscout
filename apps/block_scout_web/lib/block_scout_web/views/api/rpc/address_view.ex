@@ -212,7 +212,7 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
     %{
       "balance" => to_string(token.balance),
       "contractAddress" => to_string(token.contract_address_hash),
-      "mixinAssetId" => token.mixin_asset_id,
+      "mixinAssetId" => if(is_nil(token.mixin_asset_id), do: "", else: token.mixin_asset_id),
       "name" => token.name,
       "decimals" => to_string(token.decimals),
       "symbol" => token.symbol,
