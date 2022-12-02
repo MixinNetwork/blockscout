@@ -92,6 +92,7 @@ defmodule BlockScoutWeb.ViewingTransactionsTest do
       |> TransactionListPage.visit_pending_transactions_page()
       |> assert_has(TransactionListPage.transaction(pending))
       |> assert_has(TransactionListPage.transaction(pending_contract))
+
       # |> assert_has(TransactionListPage.transaction_status(pending_contract))
     end
 
@@ -110,6 +111,7 @@ defmodule BlockScoutWeb.ViewingTransactionsTest do
 
       session
       |> TransactionListPage.visit_page()
+
       # |> assert_has(TransactionListPage.contract_creation(transaction))
     end
   end

@@ -43,6 +43,7 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
       |> BlockPage.visit_page(block)
       |> assert_has(BlockPage.detail_number(block))
       |> assert_has(BlockPage.transaction(transaction))
+
       # |> assert_has(BlockPage.transaction_status(transaction))
     end
 
