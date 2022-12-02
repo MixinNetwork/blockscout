@@ -26,7 +26,7 @@ defmodule :"Elixir.Explorer.Repo.Migrations.FixAddressCurrentTokenBalancesIndexe
         name: :fetched_token_balances
       )
     )
- 
+
     create_if_not_exists(
       unique_index(
         :address_current_token_balances,
