@@ -2621,7 +2621,7 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
           "decimals" => to_string(token_balance.token.decimals),
           "symbol" => token_balance.token.symbol,
           "type" => token_balance.token.type,
-          "mixinAssetId" => nil
+          "mixinAssetId" => ""
         }
       ]
 
