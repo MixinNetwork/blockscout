@@ -4368,6 +4368,8 @@ defmodule Explorer.Chain do
       )
 
     current_smart_contract = Repo.one(query)
+    IO.inspect(address_hash) 
+    IO.inspect(current_smart_contract)
 
     if current_smart_contract do
       current_smart_contract
@@ -4379,9 +4381,9 @@ defmodule Explorer.Chain do
       if address_verified_twin_contract do
         address_verified_twin_contract
         |> Map.put(:address_hash, address_hash)
-        |> Map.put(:implementation_address_hash, current_smart_contract.implementation_address_hash)
-        |> Map.put(:implementation_name, current_smart_contract.implementation_name)
-        |> Map.put(:implementation_fetched_at, current_smart_contract.implementation_fetched_at)
+        # |> Map.put(:implementation_address_hash, current_smart_contract.implementation_address_hash)
+        # |> Map.put(:implementation_name, current_smart_contract.implementation_name)
+        # |> Map.put(:implementation_fetched_at, current_smart_contract.implementation_fetched_at)
       else
         current_smart_contract
       end

@@ -803,8 +803,10 @@ defmodule Explorer.Chain.SmartContract do
               "0x0000000000000000000000000000000000000000000000000000000000000000",
               @burn_address_hash_str
             ] do
-    proxy_address_hash
-    |> Chain.address_hash_to_smart_contract_without_twin()
+    smart_contract = Chain.address_hash_to_smart_contract_without_twin(proxy_address_hash)
+    smart_contract = if(is_nil(smart_contract), do: %Explorer.Chain.SmartContract{}, else: smart_contract)
+ 
+    smart_contract
     |> changeset(%{
       implementation_name: nil,
       implementation_address_hash: nil,
