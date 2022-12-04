@@ -804,9 +804,9 @@ defmodule Explorer.Chain.SmartContract do
               @burn_address_hash_str
             ] do
     smart_contract = Chain.address_hash_to_smart_contract_without_twin(proxy_address_hash)
-    smart_contract = if(is_nil(smart_contract), do: %Explorer.Chain.SmartContract{}, else: smart_contract)
- 
-    smart_contract
+    ins = if(is_nil(smart_contract), do: %Explorer.Chain.SmartContract{}, else: smart_contract)
+
+    ins
     |> changeset(%{
       implementation_name: nil,
       implementation_address_hash: nil,
