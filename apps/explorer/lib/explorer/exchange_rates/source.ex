@@ -2,31 +2,89 @@ defmodule Explorer.ExchangeRates.Source do
   @moduledoc """
   Behaviour for fetching exchange rates from external sources.
   """
+  alias Explorer.Chain
   alias Explorer.ExchangeRates.Source.CoinGecko
   alias Explorer.ExchangeRates.Token
+  alias Explorer.MIXIN_API
   alias HTTPoison.{Error, Response}
+
+  @eth_asset_id "43d61dcd-e413-450d-80b8-101d5e903357"
 
   @doc """
   Fetches exchange rates for currencies/tokens.
   """
   @spec fetch_exchange_rates(module) :: {:ok, [Token.t()]} | {:error, any}
   def fetch_exchange_rates(source \\ exchange_rates_source()) do
-    source_url = source.source_url()
-    fetch_exchange_rates_request(source, source_url, source.headers())
+    source_url = source.source_url()    
+    resp = fetch_exchange_rates_request(source, source_url, source.headers())
+    update_price_with_mixin_asset(resp) 
   end
 
   @spec fetch_exchange_rates_for_token(String.t()) :: {:ok, [Token.t()]} | {:error, any}
   def fetch_exchange_rates_for_token(symbol) do
     source_url = CoinGecko.source_url(symbol)
     headers = CoinGecko.headers()
-    fetch_exchange_rates_request(CoinGecko, source_url, headers)
+    resp = fetch_exchange_rates_request(CoinGecko, source_url, headers)
+    update_price_with_mixin_asset(resp, symbol)
   end
 
   @spec fetch_exchange_rates_for_token_address(String.t()) :: {:ok, [Token.t()]} | {:error, any}
   def fetch_exchange_rates_for_token_address(address_hash) do
     source_url = CoinGecko.source_url(address_hash)
     headers = CoinGecko.headers()
-    fetch_exchange_rates_request(CoinGecko, source_url, headers)
+    resp = fetch_exchange_rates_request(CoinGecko, source_url, headers)
+    update_price_with_mixin_asset(resp, address_hash)
+  end
+
+  defp update_price_with_mixin_asset(resp, input \\ nil) do
+    case resp do
+      {:ok, data} ->
+        asset = fetch_mixin_asset(input)
+        token = 
+          data
+          |> List.first()
+          |> Map.put(:btc_value, asset["price_btc"])
+          |> Map.put(:usd_value, asset["price_usd"])
+        {:ok, [token]} 
+
+      _ -> resp
+    end 
+  end
+
+  defp fetch_mixin_asset(input) do
+    asset_id = get_mixin_asset_id(input)
+
+    if is_nil(asset_id) do
+      nil
+    else
+      url = "/network/assets/#{asset_id}"
+      case MIXIN_API.request(url) do
+        {:ok, asset} -> asset
+        {:error, _} -> nil
+      end
+    end  
+  end
+
+  defp get_mixin_asset_id(input) do
+    case Chain.Hash.Address.cast(input) do 
+      {:ok, address_hash} ->
+        query = Chain.token_from_address_hash(address_hash)
+        case query do
+          {:ok, token} -> token.mixin_asset_id
+          {:error, _} -> nil
+        end 
+
+      _ -> 
+        symbol = input
+        case is_nil(symbol) do
+          true -> @eth_asset_id 
+          _ -> 
+            case Chain.token_from_token_symbol(symbol) do
+              {:ok, token} -> token.mixin_asset_id
+              {:error, _} -> nil
+            end
+        end
+    end
   end
 
   defp fetch_exchange_rates_request(_source, source_url, _headers) when is_nil(source_url),

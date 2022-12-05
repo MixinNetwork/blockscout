@@ -1445,6 +1445,29 @@ defmodule Explorer.Chain do
     end
   end
 
+  @spec token_from_token_symbol(String.t()) :: {:ok, Token.t()} | {:error, :not_found}
+  def token_from_token_symbol(symbol) when is_binary(symbol) do
+    query =
+      from(token in Token,
+        where: ilike(token.symbol, ^symbol),
+        select: token
+      )
+
+    query
+    |> Repo.all()
+    |> case do
+      [] ->
+        {:error, :not_found}
+
+      hashes ->
+        if Enum.count(hashes) == 1 do
+          {:ok, List.first(hashes)}
+        else
+          {:error, :not_found}
+        end
+    end
+  end
+
   defp prepare_search_term(string) do
     case Regex.scan(~r/[a-zA-Z0-9]+/, string) do
       [_ | _] = words ->
