@@ -1,4 +1,4 @@
-defmodule BlockScoutWeb.MIXIN_API do
+defmodule Explorer.MIXIN_API do
   @moduledoc false
  
   @base_url "https://api.mixin.one"
