@@ -28,6 +28,9 @@ defmodule Explorer.ExchangeRates do
   # Callback for successful fetch
   @impl GenServer
   def handle_info({_ref, {:ok, tokens}}, state) do
+    IO.inspect("handle_info")
+    IO.inspect(tokens)
+
     if store() == :ets do
       records = Enum.map(tokens, &Token.to_tuple/1)
       :ets.insert(table_name(), records)
@@ -122,7 +125,7 @@ defmodule Explorer.ExchangeRates do
   @spec fetch_rates :: Task.t()
   defp fetch_rates do
     Task.Supervisor.async_nolink(Explorer.MarketTaskSupervisor, fn ->
-      Source.fetch_exchange_rates()
+      Source.fetch_exchange_rates_from_mixin()
     end)
   end
 
