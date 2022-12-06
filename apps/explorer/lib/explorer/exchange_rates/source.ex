@@ -3,6 +3,7 @@ defmodule Explorer.ExchangeRates.Source do
   Behaviour for fetching exchange rates from external sources.
   """
   alias Explorer.Chain
+  alias Explorer.Chain.Hash.Address
   alias Explorer.ExchangeRates.Source.CoinGecko
   alias Explorer.ExchangeRates.Token
   alias Explorer.MIXIN_API
@@ -37,10 +38,21 @@ defmodule Explorer.ExchangeRates.Source do
   def fetch_exchange_rates_from_mixin() do
     eth_rate = fetch_exchange_rates()
 
-    tokens = Chain.list_erc20_tokens_with_mixin_asset_id_and_ethereum_contract()
+    tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
     tokens_rate = Enum.map(tokens, fn t ->
-      resp = fetch_exchange_rates_for_token_address(t.ethereum_contract_address)
-      update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
+      with {:ok, true} <- {:ok, not is_nil(t.ethereum_contract_address)},
+           {:ok, _} <- Address.cast(t.ethereum_contract_address) do
+        resp = fetch_exchange_rates_for_token_address(t.ethereum_contract_address)
+        update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
+      else
+        {:ok, false} ->
+          resp = fetch_exchange_rates_for_token(t.symbol)
+          update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
+
+        :error ->
+          resp = fetch_exchange_rates_for_token(t.symbol)
+          update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
+      end
     end)
 
     token_list = Enum.filter(Enum.map([eth_rate | tokens_rate], fn t -> 

@@ -29,7 +29,7 @@ defmodule Explorer.KnownTokens do
   @impl GenServer
   def handle_info({_ref, {:ok, addresses}}, state) do
     if store() == :ets do
-      records = Enum.map(addresses, fn x -> {x["symbol"], x["address"]} end)
+      records = Enum.map(addresses, fn x -> {x["asset_id"], x["asset_key"]} end)
 
       :ets.insert(table_name(), records)
     end

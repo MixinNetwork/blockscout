@@ -9,22 +9,25 @@ defmodule Explorer.Market do
   alias Explorer.Market.{MarketHistory, MarketHistoryCache}
   alias Explorer.{ExchangeRates, KnownTokens, Repo}
 
+  @eth_asset_id "43d61dcd-e413-450d-80b8-101d5e903357"
+
   @doc """
   Get most recent exchange rate for the given symbol.
   """
   @spec get_exchange_rate(String.t()) :: Token.t() | nil
-  def get_exchange_rate(symbol) do
-    ExchangeRates.lookup(symbol)
+  def get_exchange_rate(input) do
+    mixin_asset_id = if(input == "ETH", do: @eth_asset_id, else: input)  
+    ExchangeRates.lookup(mixin_asset_id)
   end
 
   @doc """
   Get the address of the token with the given symbol.
   """
   @spec get_known_address(String.t()) :: Hash.Address.t() | nil
-  def get_known_address(symbol) do
-    case KnownTokens.lookup(symbol) do
+  def get_known_address(mixin_asset_id) do
+    case KnownTokens.lookup(mixin_asset_id) do
       {:ok, address} -> address
-      nil -> nil
+      _ -> nil
     end
   end
 
@@ -51,19 +54,9 @@ defmodule Explorer.Market do
     Repo.insert_all(MarketHistory, records_without_zeroes, on_conflict: :nothing, conflict_target: [:date])
   end
 
-  def add_price(%{symbol: symbol} = token) do
-    known_address = get_known_address(symbol)
-
-    matches_known_address = known_address && known_address == token.contract_address_hash
-
-    usd_value =
-      if matches_known_address do
-        fetch_token_usd_value(matches_known_address, symbol)
-      else
-        nil
-      end
-
-    Map.put(token, :usd_value, usd_value)
+  def add_price(%{mixin_asset_id: mixin_asset_id} = token) do
+    usd_value = fetch_token_usd_value(mixin_asset_id)
+    Map.put(token, :usd_value, if(is_nil(usd_value), do: Decimal.new(0), else: usd_value))
   end
 
   def add_price(%CurrentTokenBalance{token: token} = token_balance) do
@@ -84,12 +77,10 @@ defmodule Explorer.Market do
     end)
   end
 
-  defp fetch_token_usd_value(true, symbol) do
-    case get_exchange_rate(symbol) do
+  defp fetch_token_usd_value(mixin_asset_id) do
+    case get_exchange_rate(mixin_asset_id) do
       %{usd_value: usd_value} -> usd_value
       nil -> nil
     end
   end
-
-  defp fetch_token_usd_value(_matches_known_address, _symbol), do: nil
 end
