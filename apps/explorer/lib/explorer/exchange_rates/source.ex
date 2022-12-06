@@ -24,36 +24,70 @@ defmodule Explorer.ExchangeRates.Source do
   def fetch_exchange_rates_for_token(symbol) do
     source_url = CoinGecko.source_url(symbol)
     headers = CoinGecko.headers()
-    resp = fetch_exchange_rates_request(CoinGecko, source_url, headers)
-    update_price_with_mixin_asset(resp, symbol)
+    fetch_exchange_rates_request(CoinGecko, source_url, headers)
   end
 
   @spec fetch_exchange_rates_for_token_address(String.t()) :: {:ok, [Token.t()]} | {:error, any}
   def fetch_exchange_rates_for_token_address(address_hash) do
     source_url = CoinGecko.source_url(address_hash)
     headers = CoinGecko.headers()
-    resp = fetch_exchange_rates_request(CoinGecko, source_url, headers)
-    update_price_with_mixin_asset(resp, address_hash)
+    fetch_exchange_rates_request(CoinGecko, source_url, headers)
   end
 
-  defp update_price_with_mixin_asset(resp, input \\ nil) do
-    case resp do
-      {:ok, data} ->
-        asset = fetch_mixin_asset(input)
-        token = 
-          data
-          |> List.first()
-          |> Map.put(:btc_value, asset["price_btc"])
-          |> Map.put(:usd_value, asset["price_usd"])
-        {:ok, [token]} 
+  def fetch_exchange_rates_from_mixin() do
+    eth_rate = fetch_exchange_rates()
 
-      _ -> resp
+    tokens = Chain.list_erc20_tokens_with_mixin_asset_id_and_ethereum_contract()
+    tokens_rate = Enum.map(tokens, fn t ->
+      resp = fetch_exchange_rates_for_token_address(t.ethereum_contract_address)
+      update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
+    end)
+
+    token_list = Enum.filter(Enum.map([eth_rate | tokens_rate], fn t -> 
+      case t do 
+        {:ok, [token]} -> token
+        _ -> nil
+      end
+    end), fn t -> not is_nil(t) end)
+
+    {:ok, token_list}
+  end
+
+  defp update_price_with_mixin_asset(resp, input \\ nil, total_supply \\ nil) do
+    asset = fetch_mixin_asset(input)
+
+    case is_nil(asset) do
+      true -> resp
+      false ->
+        case resp do
+          {:ok, data} ->
+            token = 
+              data
+              |> List.first()
+              |> Map.put(:btc_value, to_decimal(asset["price_btc"]))
+              |> Map.put(:usd_value, to_decimal(asset["price_usd"]))
+            {:ok, [token]} 
+
+          _ -> 
+            token_rate = %Token{
+              available_supply: to_decimal(asset["amount"]),
+              total_supply: if(is_nil(total_supply), do: to_decimal(asset["amount"]), else: to_decimal(total_supply)),
+              btc_value: to_decimal(asset["price_btc"]),
+              id: "",
+              last_updated: nil,
+              market_cap_usd: to_decimal(asset["capitalization"]),
+              name: asset["name"],
+              symbol: String.upcase(asset["symbol"]),
+              usd_value: to_decimal(asset["price_usd"]),
+              volume_24h_usd: to_decimal(0) 
+            }
+            {:ok, [token_rate]}
+        end
     end 
   end
 
   defp fetch_mixin_asset(input) do
     asset_id = get_mixin_asset_id(input)
-
     if is_nil(asset_id) do
       nil
     else

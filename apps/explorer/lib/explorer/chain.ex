@@ -2505,6 +2505,20 @@ defmodule Explorer.Chain do
     fetch_top_tokens(filter, paging_options)
   end
 
+  def list_erc20_tokens_with_mixin_asset_id_and_ethereum_contract() do
+    query =
+      from(t in Token,
+        where: t.total_supply > ^0,
+        where: t.type == "ERC-20",
+        where: not is_nil(t.mixin_asset_id),
+        where: not is_nil(t.ethereum_contract_address),
+        order_by: [desc_nulls_last: t.holder_count, asc: t.name],
+        preload: [:contract_address]
+      )
+    
+    Repo.all(query)
+  end
+
   defp fetch_top_tokens(filter, paging_options) do
     base_query =
       from(t in Token,
