@@ -27,12 +27,13 @@ defmodule Explorer.ExchangeRates.Token do
           name: String.t(),
           symbol: String.t(),
           usd_value: Decimal.t(),
-          volume_24h_usd: Decimal.t()
+          volume_24h_usd: Decimal.t(),
+          mixin_asset_id: String.t()
         }
 
   @derive Jason.Encoder
   @enforce_keys ~w(available_supply total_supply btc_value id last_updated market_cap_usd name symbol usd_value volume_24h_usd)a
-  defstruct ~w(available_supply total_supply btc_value id last_updated market_cap_usd name symbol usd_value volume_24h_usd)a
+  defstruct ~w(available_supply total_supply btc_value id last_updated market_cap_usd name symbol usd_value volume_24h_usd mixin_asset_id)a
 
   def null,
     do: %__MODULE__{
@@ -45,7 +46,8 @@ defmodule Explorer.ExchangeRates.Token do
       volume_24h_usd: nil,
       market_cap_usd: nil,
       btc_value: nil,
-      last_updated: nil
+      last_updated: nil,
+      mixin_asset_id: nil
     }
 
   def null?(token), do: token == null()
@@ -60,15 +62,16 @@ defmodule Explorer.ExchangeRates.Token do
         volume_24h_usd: volume_24h_usd,
         market_cap_usd: market_cap_usd,
         btc_value: btc_value,
-        last_updated: last_updated
+        last_updated: last_updated,
+        mixin_asset_id: mixin_asset_id
       }) do
     # symbol is first because it is the key used for lookup in `Explorer.ExchangeRates`'s ETS table
-    {symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd, btc_value,
+    {mixin_asset_id, symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd, btc_value,
      last_updated}
   end
 
   def from_tuple(
-        {symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd, btc_value,
+        {mixin_asset_id, symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd, btc_value,
          last_updated}
       ) do
     %__MODULE__{
@@ -81,7 +84,8 @@ defmodule Explorer.ExchangeRates.Token do
       volume_24h_usd: volume_24h_usd,
       market_cap_usd: market_cap_usd,
       btc_value: btc_value,
-      last_updated: last_updated
+      last_updated: last_updated,
+      mixin_asset_id: mixin_asset_id
     }
   end
 end

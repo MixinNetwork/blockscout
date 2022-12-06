@@ -30,6 +30,8 @@ defmodule Explorer.ExchangeRates do
   def handle_info({_ref, {:ok, tokens}}, state) do
     if store() == :ets do
       records = Enum.map(tokens, &Token.to_tuple/1)
+      IO.inspect("insert")
+      IO.inspect(records, limit: :infinity)
       :ets.insert(table_name(), records)
     end
 

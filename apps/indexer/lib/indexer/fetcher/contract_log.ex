@@ -103,7 +103,7 @@ defmodule Indexer.Fetcher.ContractLog do
   defp fetch_asset_ethereum_contract_address(uuid) do
     resp = MIXIN_API.request("/network/assets/#{uuid}")
     case resp do
-      {:ok, asset} -> if(asset["asset_key"] == uuid, do: nil, else: asset["asset_key"])
+      {:ok, asset} -> if(asset["asset_key"] == uuid or asset["asset_key"] == "0x0000000000000000000000000000000000000000", do: nil, else: asset["asset_key"])
       _ -> nil
     end
   end
