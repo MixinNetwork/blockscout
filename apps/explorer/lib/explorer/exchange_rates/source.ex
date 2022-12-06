@@ -66,6 +66,7 @@ defmodule Explorer.ExchangeRates.Source do
               |> List.first()
               |> Map.put(:btc_value, to_decimal(asset["price_btc"]))
               |> Map.put(:usd_value, to_decimal(asset["price_usd"]))
+              |> Map.put(:mixin_asset_id, asset["asset_id"])
             {:ok, [token]} 
 
           _ -> 
@@ -79,7 +80,8 @@ defmodule Explorer.ExchangeRates.Source do
               name: asset["name"],
               symbol: String.upcase(asset["symbol"]),
               usd_value: to_decimal(asset["price_usd"]),
-              volume_24h_usd: to_decimal(0) 
+              volume_24h_usd: to_decimal(0),
+              mixin_asset_id: asset["asset_id"]
             }
             {:ok, [token_rate]}
         end
