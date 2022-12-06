@@ -16,6 +16,7 @@ defmodule Indexer.Fetcher.ContractLog do
   alias Explorer.Chain.Address, as: ChainAddress
   alias Explorer.Chain.Hash.Address
   alias Explorer.Chain.Token
+  alias Explorer.MIXIN_API
   alias Explorer.Token.MetadataRetriever
   alias Indexer.{BufferedTask, Tracer}
 
@@ -99,6 +100,14 @@ defmodule Indexer.Fetcher.ContractLog do
     end
   end
 
+  defp fetch_asset_ethereum_contract_address(uuid) do
+    resp = MIXIN_API.request("/network/assets/#{uuid}")
+    case resp do
+      {:ok, asset} -> asset["asset_key"]
+      _ -> nil
+    end
+  end
+
   defp loop_contract_logs(filter) do
     url = Application.get_env(:block_scout_web, :json_rpc)
     start = get_last_block_number()
@@ -156,6 +165,8 @@ defmodule Indexer.Fetcher.ContractLog do
 
           with {:ok, addr} <- Chain.string_to_address_hash(address_string),
                {:ok, uuid} <- UUID.load(Base.decode16!(String.slice(x["data"], 34..-1), case: :mixed)) do
+            ethereum_contract_address = fetch_asset_ethereum_contract_address(uuid) 
+
             case Chain.token_from_address_hash(addr) do
               {:ok, token} ->
                 Chain.update_token(%{token | updated_at: DateTime.utc_now()}, %{
@@ -167,6 +178,7 @@ defmodule Indexer.Fetcher.ContractLog do
                   addr
                   |> MetadataRetriever.get_functions_of()
                   |> Map.put(:mixin_asset_id, uuid)
+                  |> Map.put(:ethereum_contract_address, ethereum_contract_address)
                   |> Map.put(:type, "ERC-20")
                   |> Map.put(:inserted_at, DateTime.utc_now())
                   |> Map.put(:updated_at, DateTime.utc_now())
