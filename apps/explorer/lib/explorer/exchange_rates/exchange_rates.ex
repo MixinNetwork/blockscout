@@ -28,9 +28,6 @@ defmodule Explorer.ExchangeRates do
   # Callback for successful fetch
   @impl GenServer
   def handle_info({_ref, {:ok, tokens}}, state) do
-    IO.inspect("handle_info")
-    IO.inspect(tokens)
-
     if store() == :ets do
       records = Enum.map(tokens, &Token.to_tuple/1)
       :ets.insert(table_name(), records)
