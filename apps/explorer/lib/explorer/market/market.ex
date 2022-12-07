@@ -21,17 +21,6 @@ defmodule Explorer.Market do
   end
 
   @doc """
-  Get the address of the token with the given symbol.
-  """
-  @spec get_known_address(String.t()) :: Hash.Address.t() | nil
-  def get_known_address(mixin_asset_id) do
-    case KnownTokens.lookup(mixin_asset_id) do
-      {:ok, address} -> address
-      _ -> nil
-    end
-  end
-
-  @doc """
   Retrieves the history for the recent specified amount of days.
 
   Today's date is include as part of the day count

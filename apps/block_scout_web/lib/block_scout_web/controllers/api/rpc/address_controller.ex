@@ -243,9 +243,20 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
             Enum.member?(mvm_default_assets, contract)
         end)
 
+      eth = %{
+        balance: Decimal.to_string(balance.value),
+        contract_address_hash: "",
+        mixin_asset_id: "43d61dcd-e413-450d-80b8-101d5e903357",
+        name: Ether,
+        decimals: "18",
+        symbol: "ETH",
+        type: ""
+      }
+
       merged =
-        Enum.map(token_list ++ default_assets, fn x ->
-          %{
+        Enum.map([eth | token_list ++ default_assets], fn x ->
+          info = Chain.token_add_price_and_chain_info(x)
+          asset = %{
             "balance" =>
               case Map.has_key?(x, :balance) do
                 true -> to_string(x.balance)
@@ -256,22 +267,21 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
             "name" => x.name,
             "decimals" => to_string(x.decimals),
             "symbol" => x.symbol,
-            "type" => x.type
+            "type" => x.type,
+            "price_usd" => info.price_usd,
+            "price_btc" => info.price_btc,
           }
-        end)
 
-      merged = [
-        %{
-          "balance" => Decimal.to_string(balance.value),
-          "contractAddress" => "",
-          "mixinAssetId" => "43d61dcd-e413-450d-80b8-101d5e903357",
-          "name" => "Ether",
-          "decimals" => "18",
-          "symbol" => "ETH",
-          "type" => ""
-        }
-        | merged
-      ]
+          case Map.has_key?(info, :chain_name) and Map.has_key?(info, :chain_symbol) and Map.has_key?(info, :chain_icon_url) do
+            true ->
+              asset
+              |> Map.put("chain_name", info.chain_name)
+              |> Map.put("chain_symbol", info.chain_symbol)
+              |> Map.put("chain_icon_url", info.chain_icon_url)
+
+            false -> asset
+          end
+        end)
 
       final = Enum.sort_by(merged, fn x -> String.to_integer(x["balance"]) end, :desc)
       render(conn, :assets, %{asset_list: final})

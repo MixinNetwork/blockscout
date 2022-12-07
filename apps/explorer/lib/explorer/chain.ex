@@ -88,7 +88,7 @@ defmodule Explorer.Chain do
   }
 
   alias Explorer.Market.MarketHistoryCache
-  alias Explorer.{PagingOptions, Repo}
+  alias Explorer.{PagingOptions, Repo, ExchangeRates, KnownTokens}
   alias Explorer.SmartContract.Helper
 
   alias Dataloader.Ecto, as: DataloaderEcto
@@ -5244,6 +5244,36 @@ defmodule Explorer.Chain do
     |> CurrentTokenBalance.last_token_balances(paging_options)
     |> page_current_token_balances(paging_options)
     |> Repo.all()
+  end
+
+  def fetch_token_price(token) do
+    asset_price = ExchangeRates.lookup(token.mixin_asset_id)
+
+    if not is_nil(asset_price) do
+      %{
+        price_usd: Decimal.to_string(asset_price.usd_value),
+        price_btc: Decimal.to_string(asset_price.btc_value),
+      }
+    else
+      %{
+        price_usd: "0",
+        price_btc: "0"
+      }
+    end
+  end
+
+  def token_add_price_and_chain_info(token) do
+    price = fetch_token_price(token)
+
+    with {:ok, asset_tuple} <- KnownTokens.lookup(token.mixin_asset_id),
+         {:ok, chain_tuple} <- KnownTokens.lookup(elem(asset_tuple, 1)) do
+      price
+      |> Map.put(:chain_name, elem(chain_tuple, 2))
+      |> Map.put(:chain_symbol, elem(chain_tuple, 3))
+      |> Map.put(:chain_icon_url, elem(chain_tuple, 4))
+    else
+      _ -> price
+    end
   end
 
   @spec erc721_or_erc1155_token_instance_from_token_id_and_token_address(binary(), Hash.Address.t()) ::
