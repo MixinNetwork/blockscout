@@ -1717,7 +1717,31 @@ defmodule Explorer.Chain do
             order_by: [desc: token.holder_count]
           )
 
-        Repo.all(query)
+        if Repo.exists?(query) do
+          Repo.all(query)
+        else
+          with {:ok, address_hash} <- Hash.Address.cast(string) do
+            query =
+              from(token in Token,
+                where: token.contract_address_hash == ^address_hash,
+                select: %{
+                  symbol: token.symbol,
+                  name: token.name,
+                  holder_count: token.holder_count,
+                  contract_address_hash: token.contract_address_hash,
+                  decimals: token.decimals,
+                  type: token.type,
+                  mixin_asset_id: token.mixin_asset_id,
+                  ethereum_contract_address: token.ethereum_contract_address,
+                  total_supply: token.total_supply
+                },
+                order_by: [desc: token.holder_count]
+              )
+            Repo.all(query)
+          else
+            _ -> []
+          end
+        end
 
       _ ->
         []
