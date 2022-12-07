@@ -100,7 +100,7 @@ defmodule Indexer.Fetcher.ContractLog do
     end
   end
 
-  defp fetch_asset_ethereum_contract_address(uuid) do
+  defp fetch_asset_native_contract_address(uuid) do
     resp = MIXIN_API.request("/network/assets/#{uuid}")
     case resp do
       {:ok, asset} -> if(asset["asset_key"] == uuid or asset["asset_key"] == "0x0000000000000000000000000000000000000000", do: nil, else: asset["asset_key"])
@@ -165,7 +165,7 @@ defmodule Indexer.Fetcher.ContractLog do
 
           with {:ok, addr} <- Chain.string_to_address_hash(address_string),
                {:ok, uuid} <- UUID.load(Base.decode16!(String.slice(x["data"], 34..-1), case: :mixed)) do
-            ethereum_contract_address = fetch_asset_ethereum_contract_address(uuid) 
+            native_contract_address = fetch_asset_native_contract_address(uuid) 
 
             case Chain.token_from_address_hash(addr) do
               {:ok, token} ->
@@ -178,7 +178,7 @@ defmodule Indexer.Fetcher.ContractLog do
                   addr
                   |> MetadataRetriever.get_functions_of()
                   |> Map.put(:mixin_asset_id, uuid)
-                  |> Map.put(:ethereum_contract_address, ethereum_contract_address)
+                  |> Map.put(:native_contract_address, native_contract_address)
                   |> Map.put(:type, "ERC-20")
                   |> Map.put(:inserted_at, DateTime.utc_now())
                   |> Map.put(:updated_at, DateTime.utc_now())

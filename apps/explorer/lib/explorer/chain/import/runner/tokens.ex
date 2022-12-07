@@ -214,12 +214,12 @@ defmodule Explorer.Chain.Import.Runner.Tokens do
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", token.inserted_at),
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", token.updated_at),
           mixin_asset_id: fragment("EXCLUDED.mixin_asset_id"),
-          ethereum_contract_address: fragment("EXCLUDED.ethereum_contract_address")
+          native_contract_address: fragment("EXCLUDED.native_contract_address")
         ]
       ],
       where:
         fragment(
-          "(EXCLUDED.name, EXCLUDED.symbol, EXCLUDED.total_supply, EXCLUDED.decimals, EXCLUDED.type, EXCLUDED.cataloged, EXCLUDED.skip_metadata, EXCLUDED.mixin_asset_id, EXCLUDED.ethereum_contract_address) IS DISTINCT FROM (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          "(EXCLUDED.name, EXCLUDED.symbol, EXCLUDED.total_supply, EXCLUDED.decimals, EXCLUDED.type, EXCLUDED.cataloged, EXCLUDED.skip_metadata, EXCLUDED.mixin_asset_id, EXCLUDED.native_contract_address) IS DISTINCT FROM (?, ?, ?, ?, ?, ?, ?, ?, ?)",
           token.name,
           token.symbol,
           token.total_supply,
@@ -228,7 +228,7 @@ defmodule Explorer.Chain.Import.Runner.Tokens do
           token.cataloged,
           token.skip_metadata,
           token.mixin_asset_id,
-          token.ethereum_contract_address
+          token.native_contract_address
         )
     )
   end

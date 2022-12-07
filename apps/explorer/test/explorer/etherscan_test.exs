@@ -1612,7 +1612,7 @@ defmodule Explorer.EtherscanTest do
 
       expected_tokens = [
         %{
-          ethereum_contract_address: nil,
+          native_contract_address: nil,
           mixin_asset_id: nil,
           balance: token_balance.value,
           contract_address_hash: token_balance.token_contract_address_hash,

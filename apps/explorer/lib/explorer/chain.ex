@@ -1702,7 +1702,7 @@ defmodule Explorer.Chain do
       {:some, term} ->
         query =
           from(token in Token,
-            where: fragment("to_tsvector(symbol || ' ' || name || ' ' || ethereum_contract_address) @@ to_tsquery(?)", ^term),
+            where: fragment("to_tsvector(symbol || ' ' || name || ' ' || native_contract_address) @@ to_tsquery(?)", ^term),
             select: %{
               symbol: token.symbol,
               name: token.name,
@@ -1711,7 +1711,7 @@ defmodule Explorer.Chain do
               decimals: token.decimals,
               type: token.type,
               mixin_asset_id: token.mixin_asset_id,
-              ethereum_contract_address: token.ethereum_contract_address,
+              native_contract_address: token.native_contract_address,
               total_supply: token.total_supply
             },
             order_by: [desc: token.holder_count]
@@ -1732,7 +1732,7 @@ defmodule Explorer.Chain do
                   decimals: token.decimals,
                   type: token.type,
                   mixin_asset_id: token.mixin_asset_id,
-                  ethereum_contract_address: token.ethereum_contract_address,
+                  native_contract_address: token.native_contract_address,
                   total_supply: token.total_supply
                 },
                 order_by: [desc: token.holder_count]
