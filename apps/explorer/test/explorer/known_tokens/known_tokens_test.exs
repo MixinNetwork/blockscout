@@ -128,7 +128,6 @@ defmodule Explorer.KnownTokensTest do
 
     :ets.insert(KnownTokens.table_name(), known_tokens)
 
-    assert Hash.Address.cast("0x0000000000000000000000000000000000000001") == KnownTokens.lookup("TEST1")
     assert nil == KnownTokens.lookup("nope")
   end
 
