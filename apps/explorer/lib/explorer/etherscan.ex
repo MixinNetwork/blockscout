@@ -335,7 +335,8 @@ defmodule Explorer.Etherscan do
           symbol: t.symbol,
           type: t.type,
           id: ctb.token_id,
-          mixin_asset_id: t.mixin_asset_id
+          mixin_asset_id: t.mixin_asset_id,
+          ethereum_contract_address: t.ethereum_contract_address
         }
       )
 
