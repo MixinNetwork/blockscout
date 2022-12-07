@@ -55,8 +55,7 @@ defmodule Explorer.Counters.AddressTokenUsdSum do
     token_balances
     |> Enum.reduce(Decimal.new(0), fn {token_balance, token}, acc ->
       if token_balance.value && token.usd_value do
-        res = Decimal.add(acc, Chain.balance_in_usd(token_balance, token))
-        IO.inspect(res)
+        Decimal.add(acc, Chain.balance_in_usd(token_balance, token))
       else
         acc
       end
