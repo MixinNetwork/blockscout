@@ -4,7 +4,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
   require Decimal
 
   alias BlockScoutWeb.API.RPC.Helpers
-  alias Explorer.{Chain, Etherscan}
+  alias Explorer.{Chain, Etherscan, PagingOptions}
   alias Explorer.Chain.{Address, Wei}
   alias Explorer.Etherscan.{Addresses, Blocks}
   alias Indexer.Fetcher.CoinBalanceOnDemand
@@ -233,10 +233,15 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       mvm_default_assets = conf[:mvm_default_assets]
       user_assets_with_balance = Enum.map(token_list, fn x -> to_string(x.contract_address_hash) end)
 
-      total_assets = Chain.list_top_tokens("")
+      total_assets = Chain.list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})
       default_assets =
         Enum.filter(total_assets, fn x ->
           contract = to_string(x.contract_address_hash)
+
+          if Enum.member?(mvm_default_assets, contract) do
+            IO.inspect(x.symbol)
+            IO.inspect(Enum.member?(user_assets_with_balance, contract))
+          end
 
           not Enum.member?(user_assets_with_balance, contract) and
             Enum.member?(mvm_default_assets, contract)
