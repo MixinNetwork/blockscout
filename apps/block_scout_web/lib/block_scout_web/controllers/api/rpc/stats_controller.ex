@@ -8,6 +8,8 @@ defmodule BlockScoutWeb.API.RPC.StatsController do
   alias Explorer.Chain.Cache.{AddressSum, AddressSumMinusBurnt}
   alias Explorer.Chain.Wei
 
+  @eth_asset_id "43d61dcd-e413-450d-80b8-101d5e903357"
+
   def tokensupply(conn, params) do
     with {:contractaddress_param, {:ok, contractaddress_param}} <- fetch_contractaddress(params),
          {:format, {:ok, address_hash}} <- to_address_hash(contractaddress_param),
@@ -61,8 +63,7 @@ defmodule BlockScoutWeb.API.RPC.StatsController do
   end
 
   def coinprice(conn, _params) do
-    symbol = Explorer.coin()
-    rates = ExchangeRates.lookup(symbol)
+    rates = ExchangeRates.lookup(@eth_asset_id)
 
     render(conn, "coinprice.json", rates: rates)
   end
