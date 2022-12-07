@@ -245,7 +245,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       eth = %{
         balance: Decimal.to_string(balance.value),
         contract_address_hash: "",
-        ethereum_contract_address: "", 
+        native_contract_address: "", 
         mixin_asset_id: "43d61dcd-e413-450d-80b8-101d5e903357",
         name: "Ether",
         decimals: "18",
@@ -259,7 +259,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
           asset = %{
             "balance" => if(Map.has_key?(x, :balance), do: to_string(x.balance), else: "0"),
             "contractAddress" => to_string(x.contract_address_hash),
-            "ethereumContractAddress" => if(is_nil(x.ethereum_contract_address), do: "", else: x.ethereum_contract_address),
+            "nativeContractAddress" => if(is_nil(x.native_contract_address), do: "", else: x.native_contract_address),
             "mixinAssetId" => x.mixin_asset_id,
             "name" => x.name,
             "decimals" => to_string(x.decimals),

@@ -3,7 +3,7 @@ defmodule Explorer.Repo.Migrations.TokensAddEthereumContractAddressHashColumn do
 
   def change do
     alter table("tokens") do
-      add(:ethereum_contract_address, :text)
+      add(:native_contract_address, :text)
     end
   end
 end
