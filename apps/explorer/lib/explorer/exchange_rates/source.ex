@@ -3,7 +3,6 @@ defmodule Explorer.ExchangeRates.Source do
   Behaviour for fetching exchange rates from external sources.
   """
   alias Explorer.Chain
-  alias Explorer.Chain.Hash.Address
   alias Explorer.ExchangeRates.Source.CoinGecko
   alias Explorer.ExchangeRates.Token
   alias Explorer.MIXIN_API
@@ -38,31 +37,42 @@ defmodule Explorer.ExchangeRates.Source do
   def fetch_exchange_rates_from_mixin() do
     eth_rate = fetch_exchange_rates()
 
-    tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
-    tokens_rate = Enum.map(tokens, fn t ->
-      with {:ok, true} <- {:ok, not is_nil(t.ethereum_contract_address)},
-           {:ok, _} <- Address.cast(t.ethereum_contract_address) do
-        resp = fetch_exchange_rates_for_token_address(t.ethereum_contract_address)
-        update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
-      else
-        {:ok, false} ->
-          resp = fetch_exchange_rates_for_token(t.symbol)
-          update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
+    resp = MIXIN_API.request("/network/assets/top")
+    with {:ok, asset_list} <- resp do
+      tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
+      token_rate = Enum.map(tokens, fn t -> 
+        asset = Enum.find(asset_list, fn a -> a["asset_id"] == t.mixin_asset_id end)
+        case asset do
+          nil -> nil
+          _ -> 
+            token_rate = %Token{
+              available_supply: to_decimal(asset["amount"]),
+              total_supply: to_decimal(asset["total_supply"]),
+              btc_value: to_decimal(asset["price_btc"]),
+              id: "",
+              last_updated: nil,
+              market_cap_usd: to_decimal(asset["capitalization"]),
+              name: asset["name"],
+              symbol: String.upcase(asset["symbol"]),
+              usd_value: to_decimal(asset["price_usd"]),
+              volume_24h_usd: to_decimal(0),
+              mixin_asset_id: asset["asset_id"]
+            }
+            {:ok, [token_rate]}
+        end
+      end) 
 
-        :error ->
-          resp = fetch_exchange_rates_for_token(t.symbol)
-          update_price_with_mixin_asset(resp, to_string(t.contract_address_hash), t.total_supply)
-      end
-    end)
-
-    token_list = Enum.filter(Enum.map([eth_rate | tokens_rate], fn t -> 
-      case t do 
-        {:ok, [token]} -> token
-        _ -> nil
-      end
-    end), fn t -> not is_nil(t) end)
-
-    {:ok, token_list}
+      token_list = Enum.filter(Enum.map([eth_rate | token_rate], fn t ->
+        case t do
+          {:ok, [token]} -> token
+          _ -> nil
+        end
+      end), fn t -> not is_nil(t) end)
+     
+      {:ok, token_list}
+    else
+      _ -> eth_rate 
+    end
   end
 
   defp update_price_with_mixin_asset(resp, input \\ nil, total_supply \\ nil) do

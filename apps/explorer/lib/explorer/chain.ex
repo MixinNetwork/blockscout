@@ -2711,7 +2711,7 @@ defmodule Explorer.Chain do
 
   def balance_in_usd(token_balance, %{usd_value: usd_value, decimals: decimals}) do
     tokens = CurrencyHelpers.divide_decimals(token_balance.value, decimals)
-    res = Decimal.mult(tokens, usd_value)
+    Decimal.mult(tokens, usd_value)
   end
 
   def balance_in_usd(%{token: %{usd_value: nil}}) do
