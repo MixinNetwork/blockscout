@@ -66,13 +66,13 @@ defmodule Explorer.ExchangeRates.Token do
         mixin_asset_id: mixin_asset_id
       }) do
     # symbol is first because it is the key used for lookup in `Explorer.ExchangeRates`'s ETS table
-    {mixin_asset_id, symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd, btc_value,
-     last_updated}
+    {mixin_asset_id, symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd,
+     btc_value, last_updated}
   end
 
   def from_tuple(
-        {mixin_asset_id, symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd, btc_value,
-         last_updated}
+        {mixin_asset_id, symbol, id, name, available_supply, total_supply, usd_value, volume_24h_usd, market_cap_usd,
+         btc_value, last_updated}
       ) do
     %__MODULE__{
       symbol: symbol,

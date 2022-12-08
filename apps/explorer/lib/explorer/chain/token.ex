@@ -50,7 +50,7 @@ defmodule Explorer.Chain.Token do
           holder_count: non_neg_integer() | nil,
           skip_metadata: boolean(),
           mixin_asset_id: String.t(),
-          native_contract_address: Hash.Address.t(),
+          native_contract_address: Hash.Address.t()
         }
 
   @derive {Poison.Encoder,

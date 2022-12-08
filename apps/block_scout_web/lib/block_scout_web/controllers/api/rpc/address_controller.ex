@@ -234,6 +234,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       user_assets_with_balance = Enum.map(token_list, fn x -> to_string(x.contract_address_hash) end)
 
       total_assets = Chain.list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})
+
       default_assets =
         Enum.filter(total_assets, fn x ->
           contract = to_string(x.contract_address_hash)
@@ -245,7 +246,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       eth = %{
         balance: Decimal.to_string(balance.value),
         contract_address_hash: "",
-        native_contract_address: "", 
+        native_contract_address: "",
         mixin_asset_id: "43d61dcd-e413-450d-80b8-101d5e903357",
         name: "Ether",
         decimals: "18",
@@ -256,6 +257,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       merged =
         Enum.map([eth | token_list ++ default_assets], fn x ->
           info = Chain.token_add_price_and_chain_info(x)
+
           asset = %{
             "balance" => if(Map.has_key?(x, :balance), do: to_string(x.balance), else: "0"),
             "contractAddress" => to_string(x.contract_address_hash),
@@ -266,10 +268,11 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
             "symbol" => x.symbol,
             "type" => x.type,
             "priceUSD" => info.price_usd,
-            "priceBTC" => info.price_btc,
+            "priceBTC" => info.price_btc
           }
 
-          case Map.has_key?(info, :chain_id) and Map.has_key?(info, :chain_name) and Map.has_key?(info, :chain_symbol) and Map.has_key?(info, :chain_icon_url) do
+          case Map.has_key?(info, :chain_id) and Map.has_key?(info, :chain_name) and Map.has_key?(info, :chain_symbol) and
+                 Map.has_key?(info, :chain_icon_url) do
             true ->
               asset
               |> Map.put("chainId", info.chain_id)
@@ -277,7 +280,8 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
               |> Map.put("chainSymbol", info.chain_symbol)
               |> Map.put("chainIconUrl", info.chain_icon_url)
 
-            false -> asset
+            false ->
+              asset
           end
         end)
 

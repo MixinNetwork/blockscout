@@ -1705,7 +1705,8 @@ defmodule Explorer.Chain do
       {:some, term} ->
         query =
           from(token in Token,
-            where: fragment("to_tsvector(symbol || ' ' || name || ' ' || native_contract_address) @@ to_tsquery(?)", ^term),
+            where:
+              fragment("to_tsvector(symbol || ' ' || name || ' ' || native_contract_address) @@ to_tsquery(?)", ^term),
             select: %{
               symbol: token.symbol,
               name: token.name,
@@ -1740,6 +1741,7 @@ defmodule Explorer.Chain do
                 },
                 order_by: [desc: token.holder_count]
               )
+
             Repo.all(query)
           else
             _ -> []
@@ -2545,7 +2547,7 @@ defmodule Explorer.Chain do
         order_by: [desc_nulls_last: t.holder_count, asc: t.name],
         preload: [:contract_address]
       )
-    
+
     Repo.all(query)
   end
 
@@ -5272,7 +5274,7 @@ defmodule Explorer.Chain do
     if not is_nil(asset_price) do
       %{
         price_usd: Decimal.to_string(asset_price.usd_value),
-        price_btc: Decimal.to_string(asset_price.btc_value),
+        price_btc: Decimal.to_string(asset_price.btc_value)
       }
     else
       %{

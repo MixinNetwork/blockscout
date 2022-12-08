@@ -48,19 +48,21 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
       "symbol" => asset.symbol,
       "type" => asset.type,
       "priceUSD" => asset.price_usd,
-      "priceBTC" => asset.price_btc,
+      "priceBTC" => asset.price_btc
     }
-   
-    case Map.has_key?(asset, :chain_id) and Map.has_key?(asset, :chain_name) and Map.has_key?(asset, :chain_symbol) and Map.has_key?(asset, :chain_icon_url) do
-      true ->
-       a
-       |> Map.put("chainId", asset.chain_id)
-       |> Map.put("chainName", asset.chain_name)
-       |> Map.put("chainSymbol", asset.chain_symbol)
-       |> Map.put("chainIconUrl", asset.chain_icon_url)
 
-      false -> a
-    end 
+    case Map.has_key?(asset, :chain_id) and Map.has_key?(asset, :chain_name) and Map.has_key?(asset, :chain_symbol) and
+           Map.has_key?(asset, :chain_icon_url) do
+      true ->
+        a
+        |> Map.put("chainId", asset.chain_id)
+        |> Map.put("chainName", asset.chain_name)
+        |> Map.put("chainSymbol", asset.chain_symbol)
+        |> Map.put("chainIconUrl", asset.chain_icon_url)
+
+      false ->
+        a
+    end
   end
 
   defp prepare_token_holder(token_holder) do
