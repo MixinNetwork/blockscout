@@ -111,18 +111,6 @@ config :ueberauth, Ueberauth,
 config :hammer,
   backend: {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60 * 4, cleanup_interval_ms: 60_000 * 10]}
 
-config :block_scout_web, BlockScoutWeb.API.RPC.AddressController,
-  mvm_default_assets: [
-    # BTC
-    "0x0e42ae5649b3a67842af0f3fc21d09d9b850a694",
-    # EOS
-    "0xe968257b324264858c0704fcd260d6673d7fe5cf",
-    # MOB
-    "0xe3cb8a2b08a760d4fc04d9c1f609d1c82fb75f60",
-    # USDT ERC20
-    "0x59e0f2e9254db4d662ef36a02118ec5dbd9f8dfb"
-  ]
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
