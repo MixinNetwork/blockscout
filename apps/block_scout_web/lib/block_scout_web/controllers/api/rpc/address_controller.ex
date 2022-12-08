@@ -9,6 +9,17 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
   alias Explorer.Etherscan.{Addresses, Blocks}
   alias Indexer.Fetcher.CoinBalanceOnDemand
 
+  @mvm_default_assets [
+    # BTC
+    "c6d0c728-2624-429b-8e0d-d9d19b6592fa",
+    # EOS
+    "6cfe566e-4aad-470b-8c9a-2fd35b49c68d",
+    # MOB
+    "eea900a8-b327-488c-8d8d-1428702fe240",
+    # USDT ERC20
+    "4d8c508b-91c5-375b-92b0-ee702ed2dac5"
+  ]
+
   def listaccounts(conn, params) do
     options =
       params
@@ -229,18 +240,14 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
          {:block_param, {:ok, block}} <- {:block_param, fetch_block_param(params)},
          {:balance, {:ok, balance}} <- {:balance, Blocks.get_balance_as_of_block(address_hash, block)},
          {:ok, token_list} <- list_tokens(address_hash) do
-      conf = Application.get_env(:block_scout_web, BlockScoutWeb.API.RPC.AddressController)
-      mvm_default_assets = conf[:mvm_default_assets]
-      user_assets_with_balance = Enum.map(token_list, fn x -> to_string(x.contract_address_hash) end)
+      user_assets_with_balance = Enum.map(token_list, fn x -> x.mixin_asset_id end)
 
       total_assets = Chain.list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})
 
       default_assets =
         Enum.filter(total_assets, fn x ->
-          contract = to_string(x.contract_address_hash)
-
-          not Enum.member?(user_assets_with_balance, contract) and
-            Enum.member?(mvm_default_assets, contract)
+          not Enum.member?(user_assets_with_balance, x.mixin_asset_id) and
+            Enum.member?(@mvm_default_assets, x.mixin_asset_id)
         end)
 
       eth = %{
