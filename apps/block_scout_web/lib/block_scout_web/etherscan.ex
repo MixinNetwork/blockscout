@@ -201,6 +201,45 @@ defmodule BlockScoutWeb.Etherscan do
     ]
   }
 
+  @account_assets_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => [
+      %{
+        "balance" => "135499",
+        "contractAddress" => "0x0000000000000000000000000000000000000000",
+        "name" => "Example Token",
+        "decimals" => "18",
+        "symbol" => "ET",
+        "type" => "ERC-20",
+        "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0",
+        "nativeContractAddress" => "0x0000000000000000000000000000000000000000",
+        "priceUSD": "1300",
+        "priceBTC": "0.08",
+        "chainId": "43d61dcd-e413-450d-80b8-101d5e903357",
+        "chainName": "Ether",
+        "chainSymbol": "ETH",
+        "chainIconUrl": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
+      },
+      %{
+        "balance" => "1",
+        "contractAddress" => "0x0000000000000000000000000000000000000001",
+        "name" => "Example ERC-721 Token",
+        "decimals" => "18",
+        "symbol" => "ET7",
+        "type" => "ERC-721",
+        "mixinAssetId" => "78470287-4b6d-4aa0-82f9-e4e90a2ef2e3",
+        "nativeContractAddress" => "0x0000000000000000000000000000000000000000",
+        "priceUSD": "0",
+        "priceBTC": "0",
+        "chainId": "43d61dcd-e413-450d-80b8-101d5e903357",
+        "chainName": "Ether",
+        "chainSymbol": "ETH",
+        "chainIconUrl": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
+      }
+    ]
+  }
+
   @account_getminedblocks_example_value %{
     "status" => "1",
     "message" => "OK",
@@ -302,12 +341,19 @@ defmodule BlockScoutWeb.Etherscan do
     "result" => [
       %{
         "contractAddress" => "0x0000000000000000000000000000000000000000",
+        "nativeContractAddress" => "0x0000000000000000000000000000000000000000",
         "decimals" => "18",
         "name" => "Example Token",
         "symbol" => "ET",
         "totalSupply" => "1000000000",
         "type" => "ERC-20",
-        "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0"
+        "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0",
+        "priceUSD": "0",
+        "priceBTC": "0",
+        "chainId": "43d61dcd-e413-450d-80b8-101d5e903357",
+        "chainName": "Ether",
+        "chainSymbol": "ETH",
+        "chainIconUrl": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
       }
     ]
   }
@@ -650,10 +696,28 @@ defmodule BlockScoutWeb.Etherscan do
     example: ~s("0x95426f2bc716022fcf1def006dbc4bb81f5b5164")
   }
 
+  @native_contract_address_type %{
+    type: "string",
+    definition: "Token's address on its own mainnet",
+    example: ~s("0x59e0f2e9254db4d662ef36a02118ec5dbd9f8dfb")
+  }
+
   @mixin_asset_id_type %{
     type: "uuid",
     definition: "Asset's corresponding uuid in Mixin Network.",
     example: ~s("3c6be09f-fe6c-4a33-a60c-543f216cd9e0")
+  }
+
+  @price_type %{
+    type: "string",
+    definition: "Token's current price string",
+    example: ~s("1300.0")
+  }
+
+  @icon_url_type %{
+    type: "string",
+    definition: "Token's icon url",
+    example: ~s("https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128")
   }
 
   @stale_type %{
@@ -986,6 +1050,34 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
+  @mixin_token_model %{
+    name: "Token",
+    fields: %{
+      name: @token_name_type,
+      symbol: @token_symbol_type,
+      totalSupply: %{
+        type: "integer",
+        definition: "The total supply of the token.",
+        example: ~s("1000000000")
+      },
+      decimals: @token_decimal_type,
+      type: %{
+        type: "token type",
+        enum: ~s(["ERC-20", "ERC-721"]),
+        enum_interpretation: %{"ERC-20" => "ERC-20 token standard", "ERC-721" => "ERC-721 token standard"}
+      },
+      contractAddress: @address_hash_type,
+      nativeContractAddress: @native_contract_address_type,
+      mixinAssetId: @mixin_asset_id_type,
+      priceUSD: @price_type,
+      priceBTC: @price_type,
+      chainId: @mixin_asset_id_type,
+      chainName: @token_name_type,
+      chainSymbol: @token_symbol_type,
+      chainIconUrl: @icon_url_type
+    }
+  }
+
   @token_balance_model %{
     name: "TokenBalance",
     fields: %{
@@ -1013,7 +1105,14 @@ defmodule BlockScoutWeb.Etherscan do
       symbol: @token_symbol_type,
       decimals: @token_decimal_type,
       contractAddress: @address_hash_type,
-      mixinAssetId: @mixin_asset_id_type
+      nativeContractAddress: @native_contract_address_type,
+      mixinAssetId: @mixin_asset_id_type,
+      priceUSD: @price_type,
+      priceBTC: @price_type,
+      chainId: @mixin_asset_id_type,
+      chainName: @token_name_type,
+      chainSymbol: @token_symbol_type,
+      chainIconUrl: @icon_url_type
     }
   }
 
@@ -1769,7 +1868,7 @@ defmodule BlockScoutWeb.Etherscan do
       %{
         code: "200",
         description: "successful operation",
-        example_value: Jason.encode!(@account_tokenlist_example_value),
+        example_value: Jason.encode!(@account_assets_example_value),
         model: %{
           name: "Result",
           fields: %{
@@ -2085,7 +2184,7 @@ defmodule BlockScoutWeb.Etherscan do
 
   @token_getmixinassets_action %{
     name: "getMixinAssets",
-    description: "Get all <a href='https://github.com/ethereum/EIPs/issues/20'>ERC-20</a> tokens with mixinAssetId",
+    description: "Get liquid <a href='https://github.com/ethereum/EIPs/issues/20'>ERC-20</a> tokens with mixinAssetId",
     required_params: [],
     optional_params: [],
     responses: [
@@ -2100,7 +2199,7 @@ defmodule BlockScoutWeb.Etherscan do
             message: @message_type,
             result: %{
               type: "model",
-              model: @token_model
+              model: @mixin_token_model
             }
           }
         }
@@ -2110,7 +2209,7 @@ defmodule BlockScoutWeb.Etherscan do
 
   @token_search_action %{
     name: "search",
-    description: "Search tokens with keyword",
+    description: "Search liquid tokens with keyword",
     required_params: [
       %{
         key: "q",
@@ -2132,7 +2231,7 @@ defmodule BlockScoutWeb.Etherscan do
             message: @message_type,
             result: %{
               type: "model",
-              model: @token_model
+              model: @mixin_token_model
             }
           }
         }
