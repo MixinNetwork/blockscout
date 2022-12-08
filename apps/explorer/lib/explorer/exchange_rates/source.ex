@@ -5,7 +5,7 @@ defmodule Explorer.ExchangeRates.Source do
   alias Explorer.Chain
   alias Explorer.ExchangeRates.Source.CoinGecko
   alias Explorer.ExchangeRates.Token
-  alias Explorer.MIXIN_API
+  alias Explorer.MixinApi
   alias HTTPoison.{Error, Response}
 
   @eth_asset_id "43d61dcd-e413-450d-80b8-101d5e903357"
@@ -37,7 +37,7 @@ defmodule Explorer.ExchangeRates.Source do
   def fetch_exchange_rates_from_mixin() do
     eth_rate = fetch_exchange_rates()
 
-    resp = MIXIN_API.request("/network/assets/top")
+    resp = MixinApi.request("/network/assets/top")
 
     with {:ok, asset_list} <- resp do
       tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
@@ -133,7 +133,7 @@ defmodule Explorer.ExchangeRates.Source do
     else
       url = "/network/assets/#{asset_id}"
 
-      case MIXIN_API.request(url) do
+      case MixinApi.request(url) do
         {:ok, asset} -> asset
         {:error, _} -> nil
       end

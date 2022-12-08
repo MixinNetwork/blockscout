@@ -1,4 +1,4 @@
-defmodule Explorer.MIXIN_API do
+defmodule Explorer.MixinApi do
   @moduledoc false
 
   @base_url "https://api.mixin.one"

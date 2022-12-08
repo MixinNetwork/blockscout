@@ -4,10 +4,9 @@ defmodule Explorer.Market do
   """
 
   alias Explorer.Chain.Address.CurrentTokenBalance
-  alias Explorer.Chain.Hash
   alias Explorer.ExchangeRates.Token
   alias Explorer.Market.{MarketHistory, MarketHistoryCache}
-  alias Explorer.{ExchangeRates, KnownTokens, Repo}
+  alias Explorer.{ExchangeRates, Repo}
 
   @eth_asset_id "43d61dcd-e413-450d-80b8-101d5e903357"
 
