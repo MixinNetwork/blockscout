@@ -278,17 +278,14 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
             "priceBTC" => info.price_btc
           }
 
-          case Map.has_key?(info, :chain_id) and Map.has_key?(info, :chain_name) and Map.has_key?(info, :chain_symbol) and
-                 Map.has_key?(info, :chain_icon_url) do
-            true ->
-              asset
-              |> Map.put("chainId", info.chain_id)
-              |> Map.put("chainName", info.chain_name)
-              |> Map.put("chainSymbol", info.chain_symbol)
-              |> Map.put("chainIconUrl", info.chain_icon_url)
-
-            false ->
-              asset
+          if Map.has_key?(info, :chain_id) and Map.has_key?(info, :chain_name) and Map.has_key?(info, :chain_symbol) and Map.has_key?(info, :chain_icon_url) do
+            asset
+            |> Map.put("chainId", info.chain_id)
+            |> Map.put("chainName", info.chain_name)
+            |> Map.put("chainSymbol", info.chain_symbol)
+            |> Map.put("chainIconUrl", info.chain_icon_url)
+          else
+            asset
           end
         end)
 

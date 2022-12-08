@@ -172,7 +172,8 @@ defmodule BlockScoutWeb.API.RPC.StatsControllerTest do
         name: "test",
         symbol: symbol,
         usd_value: Decimal.new("1.0"),
-        volume_24h_usd: Decimal.new("1000.0")
+        volume_24h_usd: Decimal.new("1000.0"),
+        mixin_asset_id: "43d61dcd-e413-450d-80b8-101d5e903357"
       }
 
       ExchangeRates.handle_info({nil, {:ok, [eth]}}, %{})

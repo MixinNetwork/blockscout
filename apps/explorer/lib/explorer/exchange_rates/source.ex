@@ -62,8 +62,8 @@ defmodule Explorer.ExchangeRates.Source do
     end
   end
 
-  defp update_price_with_mixin_asset(resp, input \\ nil, total_supply \\ nil) do
-    asset = fetch_mixin_asset(input)
+  defp update_price_with_mixin_asset(resp) do
+    asset = fetch_eth_asset()
 
     case is_nil(asset) do
       true ->
@@ -123,41 +123,12 @@ defmodule Explorer.ExchangeRates.Source do
     end
   end
 
-  defp fetch_mixin_asset(input) do
-    asset_id = get_mixin_asset_id(input)
+  defp fetch_eth_asset(input) do
+    url = "/network/assets/#{@eth_asset_id}"
 
-    if is_nil(asset_id) do
-      nil
-    else
-      url = "/network/assets/#{asset_id}"
-
-      case MixinApi.request(url) do
-        {:ok, asset} -> asset
-        {:error, _} -> nil
-      end
-    end
-  end
-
-  defp get_mixin_asset_id(input) do
-    case Chain.Hash.Address.cast(input) do
-      {:ok, address_hash} ->
-        query = Chain.token_from_address_hash(address_hash)
-
-        case query do
-          {:ok, token} -> token.mixin_asset_id
-          {:error, _} -> nil
-        end
-
-      _ ->
-        symbol = input
-
-        with {:ok, false} <- {:ok, is_nil(symbol)},
-             {:ok, token} <- Chain.token_from_token_symbol(symbol) do
-          token.mixin_asset_id
-        else
-          {:ok, true} -> @eth_asset_id
-          {:error, _} -> nil
-        end
+    case MixinApi.request(url) do
+      {:ok, asset} -> asset
+      {:error, _} -> nil
     end
   end
 

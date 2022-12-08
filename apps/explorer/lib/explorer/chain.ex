@@ -5297,7 +5297,7 @@ defmodule Explorer.Chain do
       |> Map.put(:chain_symbol, elem(chain_tuple, 3))
       |> Map.put(:chain_icon_url, elem(chain_tuple, 4))
     else
-      _ -> price
+      nil -> price
     end
   end
 

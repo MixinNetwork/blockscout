@@ -214,12 +214,13 @@ defmodule BlockScoutWeb.Etherscan do
         "type" => "ERC-20",
         "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0",
         "nativeContractAddress" => "0x0000000000000000000000000000000000000000",
-        "priceUSD": "1300",
-        "priceBTC": "0.08",
-        "chainId": "43d61dcd-e413-450d-80b8-101d5e903357",
-        "chainName": "Ether",
-        "chainSymbol": "ETH",
-        "chainIconUrl": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
+        priceUSD: "1300",
+        priceBTC: "0.08",
+        chainId: "43d61dcd-e413-450d-80b8-101d5e903357",
+        chainName: "Ether",
+        chainSymbol: "ETH",
+        chainIconUrl:
+          "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
       },
       %{
         "balance" => "1",
@@ -230,12 +231,13 @@ defmodule BlockScoutWeb.Etherscan do
         "type" => "ERC-721",
         "mixinAssetId" => "78470287-4b6d-4aa0-82f9-e4e90a2ef2e3",
         "nativeContractAddress" => "0x0000000000000000000000000000000000000000",
-        "priceUSD": "0",
-        "priceBTC": "0",
-        "chainId": "43d61dcd-e413-450d-80b8-101d5e903357",
-        "chainName": "Ether",
-        "chainSymbol": "ETH",
-        "chainIconUrl": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
+        priceUSD: "0",
+        priceBTC: "0",
+        chainId: "43d61dcd-e413-450d-80b8-101d5e903357",
+        chainName: "Ether",
+        chainSymbol: "ETH",
+        chainIconUrl:
+          "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
       }
     ]
   }
@@ -348,12 +350,13 @@ defmodule BlockScoutWeb.Etherscan do
         "totalSupply" => "1000000000",
         "type" => "ERC-20",
         "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0",
-        "priceUSD": "0",
-        "priceBTC": "0",
-        "chainId": "43d61dcd-e413-450d-80b8-101d5e903357",
-        "chainName": "Ether",
-        "chainSymbol": "ETH",
-        "chainIconUrl": "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
+        priceUSD: "0",
+        priceBTC: "0",
+        chainId: "43d61dcd-e413-450d-80b8-101d5e903357",
+        chainName: "Ether",
+        chainSymbol: "ETH",
+        chainIconUrl:
+          "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
       }
     ]
   }
@@ -717,7 +720,8 @@ defmodule BlockScoutWeb.Etherscan do
   @icon_url_type %{
     type: "string",
     definition: "Token's icon url",
-    example: ~s("https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128")
+    example:
+      ~s("https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128")
   }
 
   @stale_type %{
