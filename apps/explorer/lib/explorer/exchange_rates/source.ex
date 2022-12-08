@@ -41,9 +41,11 @@ defmodule Explorer.ExchangeRates.Source do
     case resp do
       {:ok, asset_list} ->
         tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
-        asset_map = Enum.reduce(asset_list, %{}, fn x, acc -> 
-          Map.put(acc, x["asset_id"], x)
-        end)
+
+        asset_map =
+          Enum.reduce(asset_list, %{}, fn x, acc ->
+            Map.put(acc, x["asset_id"], x)
+          end)
 
         token_rate =
           Enum.map(tokens, fn t ->
@@ -51,12 +53,12 @@ defmodule Explorer.ExchangeRates.Source do
             get_exchange_rate_token(asset)
           end)
 
-        token_list = 
-          Enum.filter([eth_rate | token_rate], fn t -> not is_nil(t) end)
+        token_list = Enum.filter([eth_rate | token_rate], fn t -> not is_nil(t) end)
 
         {:ok, token_list}
 
-      _ -> {:ok, [eth_rate]}
+      _ ->
+        {:ok, [eth_rate]}
     end
   end
 
@@ -101,7 +103,8 @@ defmodule Explorer.ExchangeRates.Source do
 
   defp get_exchange_rate_token(asset) do
     case asset do
-      nil -> nil
+      nil ->
+        nil
 
       _ ->
         %Token{
@@ -152,8 +155,7 @@ defmodule Explorer.ExchangeRates.Source do
              {:ok, token} <- Chain.token_from_token_symbol(symbol) do
           token.mixin_asset_id
         else
-          {:ok, true} -> @eth_asset_id  
-
+          {:ok, true} -> @eth_asset_id
           {:error, _} -> nil
         end
     end
