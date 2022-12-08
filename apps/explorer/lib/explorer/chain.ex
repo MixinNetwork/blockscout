@@ -88,7 +88,7 @@ defmodule Explorer.Chain do
   }
 
   alias Explorer.Market.MarketHistoryCache
-  alias Explorer.{PagingOptions, Repo, ExchangeRates, KnownTokens}
+  alias Explorer.{ExchangeRates, KnownTokens, PagingOptions, Repo}
   alias Explorer.SmartContract.Helper
 
   alias Dataloader.Ecto, as: DataloaderEcto
@@ -1724,26 +1724,27 @@ defmodule Explorer.Chain do
         if Repo.exists?(query) do
           Repo.all(query)
         else
-          with {:ok, address_hash} <- Hash.Address.cast(string) do
-            query =
-              from(token in Token,
-                where: token.contract_address_hash == ^address_hash,
-                select: %{
-                  symbol: token.symbol,
-                  name: token.name,
-                  holder_count: token.holder_count,
-                  contract_address_hash: token.contract_address_hash,
-                  decimals: token.decimals,
-                  type: token.type,
-                  mixin_asset_id: token.mixin_asset_id,
-                  native_contract_address: token.native_contract_address,
-                  total_supply: token.total_supply
-                },
-                order_by: [desc: token.holder_count]
-              )
+          case Hash.Address.cast(string) do
+            {:ok, address_hash} ->
+              query =
+                from(token in Token,
+                  where: token.contract_address_hash == ^address_hash,
+                  select: %{
+                    symbol: token.symbol,
+                    name: token.name,
+                    holder_count: token.holder_count,
+                    contract_address_hash: token.contract_address_hash,
+                    decimals: token.decimals,
+                    type: token.type,
+                    mixin_asset_id: token.mixin_asset_id,
+                    native_contract_address: token.native_contract_address,
+                    total_supply: token.total_supply
+                  },
+                  order_by: [desc: token.holder_count]
+                )
 
-            Repo.all(query)
-          else
+              Repo.all(query)
+
             _ -> []
           end
         end
@@ -2538,7 +2539,7 @@ defmodule Explorer.Chain do
     fetch_top_tokens(filter, paging_options)
   end
 
-  def list_erc20_tokens_with_mixin_asset_id() do
+  def list_erc20_tokens_with_mixin_asset_id do
     query =
       from(t in Token,
         where: t.total_supply > ^0,
