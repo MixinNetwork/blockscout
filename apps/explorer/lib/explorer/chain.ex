@@ -1745,7 +1745,8 @@ defmodule Explorer.Chain do
 
               Repo.all(query)
 
-            _ -> []
+            _ ->
+              []
           end
         end
 
