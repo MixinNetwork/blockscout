@@ -238,11 +238,6 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
         Enum.filter(total_assets, fn x ->
           contract = to_string(x.contract_address_hash)
 
-          if Enum.member?(mvm_default_assets, contract) do
-            IO.inspect(x.symbol)
-            IO.inspect(Enum.member?(user_assets_with_balance, contract))
-          end
-
           not Enum.member?(user_assets_with_balance, contract) and
             Enum.member?(mvm_default_assets, contract)
         end)
