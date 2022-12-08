@@ -102,9 +102,16 @@ defmodule Indexer.Fetcher.ContractLog do
 
   defp fetch_asset_native_contract_address(uuid) do
     resp = MIXIN_API.request("/network/assets/#{uuid}")
+
     case resp do
-      {:ok, asset} -> if(asset["asset_key"] == uuid or asset["asset_key"] == "0x0000000000000000000000000000000000000000", do: nil, else: asset["asset_key"])
-      _ -> nil
+      {:ok, asset} ->
+        if(asset["asset_key"] == uuid or asset["asset_key"] == "0x0000000000000000000000000000000000000000",
+          do: nil,
+          else: asset["asset_key"]
+        )
+
+      _ ->
+        nil
     end
   end
 
@@ -165,7 +172,7 @@ defmodule Indexer.Fetcher.ContractLog do
 
           with {:ok, addr} <- Chain.string_to_address_hash(address_string),
                {:ok, uuid} <- UUID.load(Base.decode16!(String.slice(x["data"], 34..-1), case: :mixed)) do
-            native_contract_address = fetch_asset_native_contract_address(uuid) 
+            native_contract_address = fetch_asset_native_contract_address(uuid)
 
             case Chain.token_from_address_hash(addr) do
               {:ok, token} ->

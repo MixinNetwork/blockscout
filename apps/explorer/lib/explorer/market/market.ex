@@ -16,7 +16,7 @@ defmodule Explorer.Market do
   """
   @spec get_exchange_rate(String.t()) :: Token.t() | nil
   def get_exchange_rate(input) do
-    mixin_asset_id = if(input == "ETH", do: @eth_asset_id, else: input)  
+    mixin_asset_id = if(input == "ETH", do: @eth_asset_id, else: input)
     ExchangeRates.lookup(mixin_asset_id)
   end
 
