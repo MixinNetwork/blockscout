@@ -513,6 +513,11 @@ msgstr "Mixin Virtual Machine (MVM) allows developers to deploy Ethereum smart c
 msgid "Burn address"
 msgstr ""
 
+#: lib/block_scout_web/templates/transaction_state/_state_change.html.eex:9
+#, elixir-autogen, elixir-format
+msgid "Burn address"
+msgstr ""
+
 #: lib/block_scout_web/templates/block/_tile.html.eex:64
 #: lib/block_scout_web/templates/block/overview.html.eex:216
 #, elixir-autogen, elixir-format

@@ -1384,7 +1384,10 @@ defmodule Explorer.Chain do
               address_verified_twin_contract_updated =
                 address_verified_twin_contract
                 |> Map.put(:address_hash, hash)
-                |> Map.put_new(:metadata_from_verified_twin, true)
+                |> Map.put(:metadata_from_verified_twin, true)
+                |> Map.put(:implementation_address_hash, nil)
+                |> Map.put(:implementation_name, nil)
+                |> Map.put(:implementation_fetched_at, nil)
 
               address_result
               |> Map.put(:smart_contract, address_verified_twin_contract_updated)
@@ -1981,7 +1984,10 @@ defmodule Explorer.Chain do
               address_verified_twin_contract_updated =
                 address_verified_twin_contract
                 |> Map.put(:address_hash, hash)
-                |> Map.put_new(:metadata_from_verified_twin, true)
+                |> Map.put(:metadata_from_verified_twin, true)
+                |> Map.put(:implementation_address_hash, nil)
+                |> Map.put(:implementation_name, nil)
+                |> Map.put(:implementation_fetched_at, nil)
 
               address_result
               |> Map.put(:smart_contract, address_verified_twin_contract_updated)
@@ -3149,6 +3155,19 @@ defmodule Explorer.Chain do
     else
       0
     end
+  end
+
+  def remove_blocks_consensus(block_numbers) do
+    numbers = List.wrap(block_numbers)
+
+    query =
+      from(
+        block in Block,
+        where: block.number in ^numbers,
+        where: block.consensus
+      )
+
+    Repo.update_all(query, set: [consensus: false])
   end
 
   @doc """
@@ -4444,9 +4463,10 @@ defmodule Explorer.Chain do
       if address_verified_twin_contract do
         address_verified_twin_contract
         |> Map.put(:address_hash, address_hash)
-        |> Map.put(:implementation_address_hash, current_smart_contract.implementation_address_hash)
-        |> Map.put(:implementation_name, current_smart_contract.implementation_name)
-        |> Map.put(:implementation_fetched_at, current_smart_contract.implementation_fetched_at)
+        |> Map.put(:metadata_from_verified_twin, true)
+        |> Map.put(:implementation_address_hash, nil)
+        |> Map.put(:implementation_name, nil)
+        |> Map.put(:implementation_fetched_at, nil)
       else
         current_smart_contract
       end
