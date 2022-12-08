@@ -41,7 +41,7 @@ defmodule Explorer.ExchangeRates.Source do
     case resp do
       {:ok, asset_list} ->
         tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
-        asset_map = Enum.reduce(asset_list, %{}, fn {x, acc} -> 
+        asset_map = Enum.reduce(asset_list, %{}, fn x, acc -> 
           Map.put(acc, x["asset_id"], x)
         end)
 
