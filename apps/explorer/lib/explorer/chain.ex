@@ -5252,15 +5252,15 @@ defmodule Explorer.Chain do
   def fetch_token_price(token) do
     asset_price = ExchangeRates.lookup(token.mixin_asset_id)
 
-    if not is_nil(asset_price) do
-      %{
-        price_usd: Decimal.to_string(asset_price.usd_value),
-        price_btc: Decimal.to_string(asset_price.btc_value)
-      }
-    else
+    if is_nil(asset_price) do
       %{
         price_usd: "0",
         price_btc: "0"
+      }
+    else
+      %{
+        price_usd: Decimal.to_string(asset_price.usd_value),
+        price_btc: Decimal.to_string(asset_price.btc_value)
       }
     end
   end
