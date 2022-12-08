@@ -16,7 +16,7 @@ defmodule Indexer.Fetcher.ContractLog do
   alias Explorer.Chain.Address, as: ChainAddress
   alias Explorer.Chain.Hash.Address
   alias Explorer.Chain.Token
-  alias Explorer.MIXIN_API
+  alias Explorer.MixinApi
   alias Explorer.Token.MetadataRetriever
   alias Indexer.{BufferedTask, Tracer}
 
@@ -101,7 +101,7 @@ defmodule Indexer.Fetcher.ContractLog do
   end
 
   defp fetch_asset_native_contract_address(uuid) do
-    resp = MIXIN_API.request("/network/assets/#{uuid}")
+    resp = MixinApi.request("/network/assets/#{uuid}")
 
     case resp do
       {:ok, asset} ->

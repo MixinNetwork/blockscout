@@ -15,7 +15,7 @@ defmodule Indexer.MixProject do
       lockfile: "../../mix.lock",
       start_permanent: Mix.env() == :prod,
       version: "4.1.8",
-      xref: [exclude: [Explorer.MIXIN_API]]
+      xref: [exclude: [Explorer.MixinApi]]
     ]
   end
 

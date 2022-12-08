@@ -5,14 +5,14 @@ defmodule Explorer.KnownTokens.Source do
 
   alias Explorer.Chain.Hash
   alias Explorer.ExchangeRates.Source
-  alias Explorer.MIXIN_API
+  alias Explorer.MixinApi
 
   @doc """
   Fetches known tokens
   """
   @spec fetch_known_tokens() :: {:ok, any} | {:error, any}
   def fetch_known_tokens() do
-    MIXIN_API.request("/network/assets/top")
+    MixinApi.request("/network/assets/top")
   end
 
   @doc """
