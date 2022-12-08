@@ -53,12 +53,24 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
   def getmixinassets(conn, _params) do
     total_assets = Chain.list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})
     erc20_assets = Enum.filter(total_assets, fn x -> x.type == "ERC-20" and not is_nil(x.mixin_asset_id) end)
-    render(conn, :getmixinassets, %{asset_list: erc20_assets})
+
+    asset_list = Enum.map(erc20_assets, fn t -> 
+      info = Chain.token_add_price_and_chain_info(t)
+      Map.merge(Map.from_struct(t), info)
+    end)
+
+    render(conn, :getmixinassets, %{asset_list: asset_list})
   end
 
   def search(conn, %{"q" => query} = _params) do
     res = Chain.search_token_asset(query)
-    render(conn, :search, %{list: res})
+
+    asset_list = Enum.map(res, fn t ->
+      info = Chain.token_add_price_and_chain_info(t)
+      Map.merge(t, info)
+    end)
+
+    render(conn, :search, %{list: asset_list})
   end
 
   defp fetch_contractaddress(params) do
