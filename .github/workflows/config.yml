@@ -498,7 +498,7 @@ jobs:
     services:
       redis_db:
         image: 'redis:alpine'
-        ports: 
+        ports:
           - 6379:6379
 
       postgres:
