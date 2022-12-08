@@ -11,7 +11,7 @@ defmodule Explorer.KnownTokens.Source do
   Fetches known tokens
   """
   @spec fetch_known_tokens() :: {:ok, any} | {:error, any}
-  def fetch_known_tokens() do
+  def fetch_known_tokens do
     MixinApi.request("/network/assets/top")
   end
 

@@ -34,54 +34,54 @@ defmodule Explorer.ExchangeRates.Source do
     fetch_exchange_rates_request(CoinGecko, source_url, headers)
   end
 
-  def fetch_exchange_rates_from_mixin() do
+  def fetch_exchange_rates_from_mixin do
     eth_rate = fetch_exchange_rates()
 
     resp = MixinApi.request("/network/assets/top")
 
-    with {:ok, asset_list} <- resp do
-      tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
+    case resp do
+      {:ok, asset_list} ->
+        tokens = Chain.list_erc20_tokens_with_mixin_asset_id()
 
-      token_rate =
-        Enum.map(tokens, fn t ->
-          asset = Enum.find(asset_list, fn a -> a["asset_id"] == t.mixin_asset_id end)
+        token_rate =
+          Enum.map(tokens, fn t ->
+            asset = Enum.find(asset_list, fn a -> a["asset_id"] == t.mixin_asset_id end)
 
-          case asset do
-            nil ->
-              nil
+            case asset do
+              nil -> nil
 
-            _ ->
-              token_rate = %Token{
-                available_supply: to_decimal(asset["amount"]),
-                total_supply: to_decimal(asset["total_supply"]),
-                btc_value: to_decimal(asset["price_btc"]),
-                id: "",
-                last_updated: nil,
-                market_cap_usd: to_decimal(asset["capitalization"]),
-                name: asset["name"],
-                symbol: String.upcase(asset["symbol"]),
-                usd_value: to_decimal(asset["price_usd"]),
-                volume_24h_usd: to_decimal(0),
-                mixin_asset_id: asset["asset_id"]
-              }
+              _ ->
+                token_rate = %Token{
+                  available_supply: to_decimal(asset["amount"]),
+                  total_supply: to_decimal(asset["total_supply"]),
+                  btc_value: to_decimal(asset["price_btc"]),
+                  id: "",
+                  last_updated: nil,
+                  market_cap_usd: to_decimal(asset["capitalization"]),
+                  name: asset["name"],
+                  symbol: String.upcase(asset["symbol"]),
+                  usd_value: to_decimal(asset["price_usd"]),
+                  volume_24h_usd: to_decimal(0),
+                  mixin_asset_id: asset["asset_id"]
+                }
 
-              {:ok, [token_rate]}
-          end
-        end)
-
-      token_list =
-        Enum.filter(
-          Enum.map([eth_rate | token_rate], fn t ->
-            case t do
-              {:ok, [token]} -> token
-              _ -> nil
+                {:ok, [token_rate]}
             end
-          end),
-          fn t -> not is_nil(t) end
-        )
+          end)
 
-      {:ok, token_list}
-    else
+        token_list =
+          Enum.filter(
+            Enum.map([eth_rate | token_rate], fn t ->
+              case t do
+                {:ok, [token]} -> token
+                _ -> nil
+              end
+            end),
+            fn t -> not is_nil(t) end
+          )
+
+        {:ok, token_list}
+
       _ -> eth_rate
     end
   end
