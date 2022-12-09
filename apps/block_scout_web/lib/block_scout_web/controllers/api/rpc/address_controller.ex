@@ -248,7 +248,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
         Enum.map(
           Enum.filter(total_assets, fn x ->
             not Enum.member?(user_assets_with_balance, x.mixin_asset_id) and
-            Enum.member?(@mvm_default_assets, x.mixin_asset_id)
+              Enum.member?(@mvm_default_assets, x.mixin_asset_id)
           end),
           fn x -> Map.from_struct(x) end
         )
