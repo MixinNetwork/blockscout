@@ -44,10 +44,24 @@ defmodule Explorer.KnownTokensTest do
   end
 
   test "handle_info with :update" do
+    asset_id = "43d61dcd-e413-450d-80b8-101d5e903357"
+    chain_id = "43d61dcd-e413-450d-80b8-101d5e903357"
+    chain_symbol = "ETH"
+    chain_name = "Ether"
+    chain_icon_url = "123"
+
+    token = %{
+      "asset_id" => asset_id,
+      "chain_id" => chain_id,
+      "chain_symbol" => chain_symbol,
+      "chain_name" => chain_name,
+      "chain_icon_url" => chain_icon_url
+    }
+
     bypass = Bypass.open()
 
     Bypass.expect(bypass, "GET", "/", fn conn ->
-      Conn.resp(conn, 200, ~s([{"symbol": "TEST1","address": "0x0000000000000000000000000000000000000001"}]))
+      Conn.resp(conn, 200, ~s([token]))
     end)
 
     stub(TestSource, :source_url, fn -> "http://localhost:#{bypass.port}" end)
@@ -57,7 +71,18 @@ defmodule Explorer.KnownTokensTest do
     state = %{}
 
     assert {:noreply, ^state} = KnownTokens.handle_info(:update, state)
-    assert_receive {_, {:ok, [%{"symbol" => "TEST1", "address" => "0x0000000000000000000000000000000000000001"}]}}
+
+    assert_receive {_,
+                    {:ok,
+                     [
+                       %{
+                         "asset_id" => asset_id,
+                         "chain_id" => chain_id,
+                         "chain_symbol" => chain_symbol,
+                         "chain_name" => chain_name,
+                         "chain_icon_url" => chain_icon_url
+                       }
+                     ]}}
   end
 
   describe "ticker fetch task" do
@@ -67,19 +92,26 @@ defmodule Explorer.KnownTokensTest do
     end
 
     test "with successful fetch" do
-      symbol = "TEST2"
-      address = "0x0000000000000000000000000000000000000002"
+      asset_id = "43d61dcd-e413-450d-80b8-101d5e903357"
+      chain_id = "43d61dcd-e413-450d-80b8-101d5e903357"
+      chain_symbol = "ETH"
+      chain_name = "Ether"
+      chain_icon_url = "123"
 
       token = %{
-        "symbol" => symbol,
-        "address" => address
+        "asset_id" => asset_id,
+        "chain_id" => chain_id,
+        "chain_symbol" => chain_symbol,
+        "chain_name" => chain_name,
+        "chain_icon_url" => chain_icon_url
       }
 
       state = %{}
 
       assert {:noreply, ^state} = KnownTokens.handle_info({nil, {:ok, [token]}}, state)
 
-      assert [{"TEST2", "0x0000000000000000000000000000000000000002"}] == :ets.lookup(KnownTokens.table_name(), symbol)
+      assert [{asset_id, chain_id, chain_name, chain_symbol, chain_icon_url}] ==
+               :ets.lookup(KnownTokens.table_name(), symbol)
     end
 
     test "with failed fetch" do
@@ -128,7 +160,7 @@ defmodule Explorer.KnownTokensTest do
 
     :ets.insert(KnownTokens.table_name(), known_tokens)
 
-    assert nil == KnownTokens.lookup("nope")
+    assert :error == KnownTokens.lookup("nope")
   end
 
   test "lookup when disabled" do

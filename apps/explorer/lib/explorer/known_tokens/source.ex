@@ -11,12 +11,7 @@ defmodule Explorer.KnownTokens.Source do
   """
   @spec fetch_known_tokens() :: {:ok, [Hash.Address.t()]} | {:error, any}
   def fetch_known_tokens(source \\ known_tokens_source()) do
-    resp = Source.http_request(source.source_url(), source.headers())
-    if Map.has_key?(resp, "data") do
-      resp["data"]
-    else
-      resp
-    end
+    Source.http_request(source.source_url(), source.headers())
   end
 
   @doc """

@@ -27,9 +27,11 @@ defmodule Explorer.KnownTokens do
 
   # Callback for successful fetch
   @impl GenServer
-  def handle_info({_ref, {:ok, addresses}}, state) do
+  def handle_info({_ref, {:ok, list}}, state) do
+    tokens = if(Map.has_key?(list, "data"), do: list["data"], else: list)
+
     if store() == :ets do
-      records = Enum.map(addresses, fn x -> to_tuple(x) end)
+      records = Enum.map(tokens, fn x -> to_tuple(x) end)
 
       :ets.insert(table_name(), records)
     end

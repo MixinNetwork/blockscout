@@ -78,17 +78,18 @@ defmodule Explorer.ExchangeRatesTest do
         name: "test_name",
         symbol: "test_symbol",
         usd_value: Decimal.new("1.0"),
-        volume_24h_usd: Decimal.new("1000.0")
+        volume_24h_usd: Decimal.new("1000.0"),
+        mixin_asset_id: "43d61dcd-e413-450d-80b8-101d5e903357"
       }
 
-      expected_symbol = expected_token.symbol
+      expected_mixin_asset_id = expected_token.mixin_asset_id
       expected_tuple = Token.to_tuple(expected_token)
 
       state = %{}
 
       assert {:noreply, ^state} = ExchangeRates.handle_info({nil, {:ok, [expected_token]}}, state)
 
-      assert [^expected_tuple] = :ets.lookup(ExchangeRates.table_name(), expected_symbol)
+      assert [^expected_tuple] = :ets.lookup(ExchangeRates.table_name(), expected_mixin_asset_id)
     end
 
     test "with failed fetch" do
@@ -119,8 +120,8 @@ defmodule Explorer.ExchangeRatesTest do
     ExchangeRates.init([])
 
     rates = [
-      %Token{Token.null() | symbol: "z"},
-      %Token{Token.null() | symbol: "a"}
+      %Token{Token.null() | mixin_asset_id: "z"},
+      %Token{Token.null() | mixin_asset_id: "a"}
     ]
 
     expected_rates = Enum.reverse(rates)
@@ -132,9 +133,9 @@ defmodule Explorer.ExchangeRatesTest do
   test "lookup/1" do
     ExchangeRates.init([])
 
-    z = %Token{Token.null() | symbol: "z"}
+    z = %Token{Token.null() | mixin_asset_id: "z"}
 
-    rates = [z, %Token{Token.null() | symbol: "a"}]
+    rates = [z, %Token{Token.null() | mixin_asset_id: "a"}]
 
     for rate <- rates, do: :ets.insert(ExchangeRates.table_name(), Token.to_tuple(rate))
 

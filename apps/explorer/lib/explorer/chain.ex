@@ -5286,20 +5286,31 @@ defmodule Explorer.Chain do
     end
   end
 
+  @spec token_add_price_and_chain_info(Token.t()) ::
+          %{
+            :price_btc => binary(),
+            :price_usd => binary(),
+            :chain_id => String.t(),
+            :chain_name => String.t(),
+            :chain_symbol => String.t(),
+            :chain_icon_url => String.t()
+          }
+          | %{:price_btc => binary(), :price_usd => binary()}
   def token_add_price_and_chain_info(token) do
     price = fetch_token_price(token)
 
     with {:ok, asset_tuple} <- KnownTokens.lookup(token.mixin_asset_id),
          {:ok, chain_tuple} <- KnownTokens.lookup(elem(asset_tuple, 1)) do
-      info = 
+      info =
         price
         |> Map.put(:chain_id, elem(chain_tuple, 0))
         |> Map.put(:chain_name, elem(chain_tuple, 2))
         |> Map.put(:chain_symbol, elem(chain_tuple, 3))
         |> Map.put(:chain_icon_url, elem(chain_tuple, 4))
+
       info
     else
-      :error -> price
+      _ -> price
     end
   end
 
