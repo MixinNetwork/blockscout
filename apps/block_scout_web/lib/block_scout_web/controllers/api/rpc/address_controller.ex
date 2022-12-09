@@ -266,7 +266,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
           info = Chain.token_add_price_and_chain_info(x)
 
           asset = %{
-            "balance" => if(Map.has_key?(x, :balance), do: to_string(x.balance), else: "0"),
+            "balance" => if(Map.has_key?(Map.from_struct(x), :balance), do: to_string(x.balance), else: "0"),
             "contractAddress" => to_string(x.contract_address_hash),
             "nativeContractAddress" => if(is_nil(x.native_contract_address), do: "", else: x.native_contract_address),
             "mixinAssetId" => x.mixin_asset_id,
@@ -278,15 +278,15 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
             "priceBTC" => info.price_btc
           }
 
-          if Map.has_key?(info, :chain_id) and Map.has_key?(info, :chain_name) and Map.has_key?(info, :chain_symbol) and
-               Map.has_key?(info, :chain_icon_url) do
+          if is_nil(info.chain_id) or is_nil(info.chain_name) or is_nil(info.chain_symbol) or
+               is_nil(info.chain_icon_url) do
+            asset
+          else
             asset
             |> Map.put("chainId", info.chain_id)
             |> Map.put("chainName", info.chain_name)
             |> Map.put("chainSymbol", info.chain_symbol)
             |> Map.put("chainIconUrl", info.chain_icon_url)
-          else
-            asset
           end
         end)
 

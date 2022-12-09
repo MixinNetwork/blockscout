@@ -49,8 +49,8 @@ defmodule Explorer.Chain.Token do
           contract_address_hash: Hash.Address.t(),
           holder_count: non_neg_integer() | nil,
           skip_metadata: boolean(),
-          mixin_asset_id: String.t(),
-          native_contract_address: Hash.Address.t()
+          mixin_asset_id: String.t() | nil,
+          native_contract_address: String.t() | nil
         }
 
   @derive {Poison.Encoder,

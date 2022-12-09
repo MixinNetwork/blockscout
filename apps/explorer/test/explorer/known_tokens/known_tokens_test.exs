@@ -111,7 +111,7 @@ defmodule Explorer.KnownTokensTest do
       assert {:noreply, ^state} = KnownTokens.handle_info({nil, {:ok, [token]}}, state)
 
       assert [{asset_id, chain_id, chain_name, chain_symbol, chain_icon_url}] ==
-               :ets.lookup(KnownTokens.table_name(), symbol)
+               :ets.lookup(KnownTokens.table_name(), asset_id)
     end
 
     test "with failed fetch" do
@@ -160,12 +160,12 @@ defmodule Explorer.KnownTokensTest do
 
     :ets.insert(KnownTokens.table_name(), known_tokens)
 
-    assert :error == KnownTokens.lookup("nope")
+    assert {:error, _} == KnownTokens.lookup("nope")
   end
 
   test "lookup when disabled" do
     Application.put_env(:explorer, Explorer.KnownTokens, enabled: false)
 
-    assert nil == KnownTokens.lookup("z")
+    assert {:error, _} == KnownTokens.lookup("z")
   end
 end

@@ -5290,12 +5290,11 @@ defmodule Explorer.Chain do
           %{
             :price_btc => binary(),
             :price_usd => binary(),
-            :chain_id => String.t(),
-            :chain_name => String.t(),
-            :chain_symbol => String.t(),
-            :chain_icon_url => String.t()
+            :chain_id => String.t() | nil,
+            :chain_name => String.t() | nil,
+            :chain_symbol => String.t() | nil,
+            :chain_icon_url => String.t() | nil
           }
-          | %{:price_btc => binary(), :price_usd => binary()}
   def token_add_price_and_chain_info(token) do
     price = fetch_token_price(token)
 
@@ -5310,7 +5309,15 @@ defmodule Explorer.Chain do
 
       info
     else
-      _ -> price
+      {:error, _} ->
+        info =
+          price
+          |> Map.put(:chain_id, nil)
+          |> Map.put(:chain_name, nil)
+          |> Map.put(:chain_symbol, nil)
+          |> Map.put(:chain_icon_url, nil)
+
+        info
     end
   end
 

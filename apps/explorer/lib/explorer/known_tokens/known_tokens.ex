@@ -93,17 +93,19 @@ defmodule Explorer.KnownTokens do
   @doc """
   Returns a specific address from the known tokens by symbol
   """
-  @spec lookup(String.t()) :: {:ok, Tuple} | :error
+  @spec lookup(String.t()) :: {:ok, tuple()} | {:error, :not_found} | {:error, :no_cache}
   def lookup(asset_id) do
     if store() == :ets && enabled?() do
       if ets_table_exists?(table_name()) do
         case :ets.lookup(table_name(), asset_id) do
           [res | _] -> {:ok, res}
-          [] -> :error
+          [] -> {:error, :not_found}
         end
       else
-        :error
+        {:error, :no_cache}
       end
+    else
+      {:error, :no_cache}
     end
   end
 
