@@ -41,26 +41,6 @@ defmodule Explorer.ExchangeRatesTest do
     assert table[:write_concurrency]
   end
 
-  test "handle_info with :update" do
-    bypass = Bypass.open()
-
-    Bypass.expect(bypass, "GET", "/", fn conn ->
-      Conn.resp(conn, 200, "{}")
-    end)
-
-    stub(TestSource, :source_url, fn -> "http://localhost:#{bypass.port}" end)
-
-    ExchangeRates.init([])
-    state = %{}
-
-    expect(TestSource, :format_data, fn _ -> [Token.null()] end)
-    expect(TestSource, :headers, fn -> [] end)
-    set_mox_global()
-
-    assert {:noreply, ^state} = ExchangeRates.handle_info(:update, state)
-    assert_receive {_, {:ok, [%Token{}]}}
-  end
-
   describe "ticker fetch task" do
     setup do
       ExchangeRates.init([])
@@ -90,29 +70,6 @@ defmodule Explorer.ExchangeRatesTest do
       assert {:noreply, ^state} = ExchangeRates.handle_info({nil, {:ok, [expected_token]}}, state)
 
       assert [^expected_tuple] = :ets.lookup(ExchangeRates.table_name(), expected_mixin_asset_id)
-    end
-
-    test "with failed fetch" do
-      bypass = Bypass.open()
-
-      Bypass.expect(bypass, "GET", "/", fn conn ->
-        Conn.resp(conn, 200, "{}")
-      end)
-
-      stub(TestSource, :source_url, fn -> "http://localhost:#{bypass.port}" end)
-
-      state = %{}
-
-      expect(TestSource, :format_data, fn _ -> [Token.null()] end)
-      expect(TestSource, :headers, fn -> [] end)
-      set_mox_global()
-
-      assert {:noreply, ^state} = ExchangeRates.handle_info({nil, {:error, "some error"}}, state)
-
-      assert_receive :update
-
-      assert {:noreply, ^state} = ExchangeRates.handle_info(:update, state)
-      assert_receive {_, {:ok, [%Token{}]}}
     end
   end
 

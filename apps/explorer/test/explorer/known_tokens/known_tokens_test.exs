@@ -91,9 +91,9 @@ defmodule Explorer.KnownTokensTest do
       token = %{
         "asset_id" => asset_id,
         "chain_id" => chain_id,
-        "chain_symbol" => chain_symbol,
-        "chain_name" => chain_name,
-        "chain_icon_url" => chain_icon_url
+        "symbol" => chain_symbol,
+        "name" => chain_name,
+        "icon_url" => chain_icon_url
       }
 
       state = %{}
