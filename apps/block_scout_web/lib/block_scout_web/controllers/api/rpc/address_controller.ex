@@ -245,10 +245,13 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
       total_assets = Chain.list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})
 
       default_assets =
-        Enum.filter(total_assets, fn x ->
-          not Enum.member?(user_assets_with_balance, x.mixin_asset_id) and
+        Enum.map(
+          Enum.filter(total_assets, fn x ->
+            not Enum.member?(user_assets_with_balance, x.mixin_asset_id) and
             Enum.member?(@mvm_default_assets, x.mixin_asset_id)
-        end)
+          end),
+          fn x -> Map.from_struct(x) end
+        )
 
       eth = %{
         balance: Decimal.to_string(balance.value),
@@ -266,7 +269,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
           info = Chain.token_add_price_and_chain_info(x)
 
           asset = %{
-            "balance" => if(Map.has_key?(Map.from_struct(x), :balance), do: to_string(x.balance), else: "0"),
+            "balance" => if(Map.has_key?(x, :balance), do: to_string(x.balance), else: "0"),
             "contractAddress" => to_string(x.contract_address_hash),
             "nativeContractAddress" => if(is_nil(x.native_contract_address), do: "", else: x.native_contract_address),
             "mixinAssetId" => x.mixin_asset_id,
