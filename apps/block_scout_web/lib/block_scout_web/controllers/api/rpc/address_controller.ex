@@ -250,7 +250,11 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
             not Enum.member?(user_assets_with_balance, x.mixin_asset_id) and
               Enum.member?(@mvm_default_assets, x.mixin_asset_id)
           end),
-          fn x -> Map.from_struct(x) end
+          fn x ->
+            x
+            |> Map.from_struct()
+            |> Map.put(:balance, "0")
+          end
         )
 
       eth = %{
@@ -269,7 +273,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
           info = Chain.token_add_price_and_chain_info(x)
 
           asset = %{
-            "balance" => if(Map.has_key?(x, :balance), do: to_string(x.balance), else: "0"),
+            "balance" => to_string(x.balance),
             "contractAddress" => to_string(x.contract_address_hash),
             "nativeContractAddress" => if(is_nil(x.native_contract_address), do: "", else: x.native_contract_address),
             "mixinAssetId" => x.mixin_asset_id,
