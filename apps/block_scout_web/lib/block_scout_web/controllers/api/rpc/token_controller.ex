@@ -136,7 +136,8 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
     asset_list =
       Enum.map(erc20_assets, fn t ->
         info = Chain.token_add_price_and_chain_info(t)
-        Map.merge(Map.from_struct(t), info)
+        asset = Map.merge(Map.from_struct(t), info)
+        asset
       end)
 
     render(conn, :getmixinassets, %{asset_list: asset_list})
@@ -153,7 +154,8 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
     asset_list =
       Enum.map(erc20_assets, fn t ->
         info = Chain.token_add_price_and_chain_info(t)
-        Map.merge(t, info)
+        asset = Map.merge(t, info)
+        asset
       end)
 
     render(conn, :search, %{list: asset_list})

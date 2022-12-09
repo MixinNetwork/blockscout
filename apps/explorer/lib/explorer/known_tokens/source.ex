@@ -3,14 +3,20 @@ defmodule Explorer.KnownTokens.Source do
   Behaviour for fetching list of known tokens.
   """
 
-  alias Explorer.MixinApi
+  alias Explorer.Chain.Hash
+  alias Explorer.ExchangeRates.Source
 
   @doc """
   Fetches known tokens
   """
-  @spec fetch_known_tokens() :: {:ok, any} | {:error, any}
-  def fetch_known_tokens do
-    MixinApi.request("/network/assets/top")
+  @spec fetch_known_tokens() :: {:ok, [Hash.Address.t()]} | {:error, any}
+  def fetch_known_tokens(source \\ known_tokens_source()) do
+    resp = Source.http_request(source.source_url(), source.headers())
+    if Map.has_key?(resp, "data") do
+      resp["data"]
+    else
+      resp
+    end
   end
 
   @doc """
@@ -19,4 +25,14 @@ defmodule Explorer.KnownTokens.Source do
   @callback source_url() :: String.t()
 
   @callback headers() :: [any()]
+
+  @spec known_tokens_source() :: module()
+  defp known_tokens_source do
+    config(:source) || Explorer.KnownTokens.Source.MyEtherWallet
+  end
+
+  @spec config(atom()) :: term
+  defp config(key) do
+    Application.get_env(:explorer, __MODULE__, [])[key]
+  end
 end

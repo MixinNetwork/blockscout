@@ -5291,13 +5291,15 @@ defmodule Explorer.Chain do
 
     with {:ok, asset_tuple} <- KnownTokens.lookup(token.mixin_asset_id),
          {:ok, chain_tuple} <- KnownTokens.lookup(elem(asset_tuple, 1)) do
-      price
-      |> Map.put(:chain_id, elem(chain_tuple, 0))
-      |> Map.put(:chain_name, elem(chain_tuple, 2))
-      |> Map.put(:chain_symbol, elem(chain_tuple, 3))
-      |> Map.put(:chain_icon_url, elem(chain_tuple, 4))
+      info = 
+        price
+        |> Map.put(:chain_id, elem(chain_tuple, 0))
+        |> Map.put(:chain_name, elem(chain_tuple, 2))
+        |> Map.put(:chain_symbol, elem(chain_tuple, 3))
+        |> Map.put(:chain_icon_url, elem(chain_tuple, 4))
+      info
     else
-      nil -> price
+      :error -> price
     end
   end
 

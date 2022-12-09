@@ -30,7 +30,8 @@ defmodule BlockScoutWeb.ExchangeRateChannelTest do
       name: "test",
       symbol: Explorer.coin(),
       usd_value: Decimal.new("2.5"),
-      volume_24h_usd: Decimal.new("1000.0")
+      volume_24h_usd: Decimal.new("1000.0"),
+      mixin_asset_id: "43d61dcd-e413-450d-80b8-101d5e903357"
     }
 
     on_exit(fn ->
