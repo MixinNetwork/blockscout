@@ -84,7 +84,7 @@ defmodule Explorer.ExchangeRates.Source do
           _ ->
             token_rate = %Token{
               available_supply: to_decimal(asset["amount"]),
-              total_supply: if(is_nil(total_supply), do: to_decimal(asset["amount"]), else: to_decimal(total_supply)),
+              total_supply: to_decimal(asset["amount"]),
               btc_value: to_decimal(asset["price_btc"]),
               id: "",
               last_updated: nil,
@@ -123,7 +123,7 @@ defmodule Explorer.ExchangeRates.Source do
     end
   end
 
-  defp fetch_eth_asset(input) do
+  defp fetch_eth_asset do
     url = "/network/assets/#{@eth_asset_id}"
 
     case MixinApi.request(url) do
