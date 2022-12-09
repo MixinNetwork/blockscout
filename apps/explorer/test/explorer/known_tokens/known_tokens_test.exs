@@ -160,12 +160,12 @@ defmodule Explorer.KnownTokensTest do
 
     :ets.insert(KnownTokens.table_name(), known_tokens)
 
-    assert {:error, _} == KnownTokens.lookup("nope")
+    assert {:error, :not_found} == KnownTokens.lookup("nope")
   end
 
   test "lookup when disabled" do
     Application.put_env(:explorer, Explorer.KnownTokens, enabled: false)
 
-    assert {:error, _} == KnownTokens.lookup("z")
+    assert {:error, :no_cache} == KnownTokens.lookup("z")
   end
 end
