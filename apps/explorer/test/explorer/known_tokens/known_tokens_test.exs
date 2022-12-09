@@ -44,24 +44,14 @@ defmodule Explorer.KnownTokensTest do
   end
 
   test "handle_info with :update" do
-    asset_id = "43d61dcd-e413-450d-80b8-101d5e903357"
-    chain_id = "43d61dcd-e413-450d-80b8-101d5e903357"
-    chain_symbol = "ETH"
-    chain_name = "Ether"
-    chain_icon_url = "123"
-
-    token = %{
-      "asset_id" => asset_id,
-      "chain_id" => chain_id,
-      "chain_symbol" => chain_symbol,
-      "chain_name" => chain_name,
-      "chain_icon_url" => chain_icon_url
-    }
-
     bypass = Bypass.open()
 
     Bypass.expect(bypass, "GET", "/", fn conn ->
-      Conn.resp(conn, 200, ~s([token]))
+      Conn.resp(
+        conn,
+        200,
+        ~s([{"asset_id": "43d61dcd-e413-450d-80b8-101d5e903357","chain_id": "43d61dcd-e413-450d-80b8-101d5e903357","chain_symbol": "ETH","chain_name": "Ether","chain_icon_url": "123"}])
+      )
     end)
 
     stub(TestSource, :source_url, fn -> "http://localhost:#{bypass.port}" end)
@@ -76,11 +66,11 @@ defmodule Explorer.KnownTokensTest do
                     {:ok,
                      [
                        %{
-                         "asset_id" => asset_id,
-                         "chain_id" => chain_id,
-                         "chain_symbol" => chain_symbol,
-                         "chain_name" => chain_name,
-                         "chain_icon_url" => chain_icon_url
+                         "asset_id" => "43d61dcd-e413-450d-80b8-101d5e903357",
+                         "chain_id" => "43d61dcd-e413-450d-80b8-101d5e903357",
+                         "chain_symbol" => "ETH",
+                         "chain_name" => "Ether",
+                         "chain_icon_url" => "123"
                        }
                      ]}}
   end
