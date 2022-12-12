@@ -23,7 +23,7 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
   end
 
   def render("batchsearch.json", %{list: asset_list}) do
-    data = Enum.map(asset_list, &prepare_batch_asset/1)
+    data = Enum.map(asset_list, &prepare_asset/1)
     RPCView.render("show.json", data: data)
   end
 
@@ -44,33 +44,6 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
   end
 
   defp prepare_asset(asset) do
-    a = %{
-      "contractAddress" => to_string(asset.contract_address_hash),
-      "nativeContractAddress" => if(is_nil(asset.native_contract_address), do: "", else: asset.native_contract_address),
-      "mixinAssetId" => asset.mixin_asset_id,
-      "name" => asset.name,
-      "decimals" => to_string(asset.decimals),
-      "symbol" => asset.symbol,
-      "type" => asset.type,
-      "priceUSD" => asset.price_usd,
-      "priceBTC" => asset.price_btc
-    }
-
-    case Map.has_key?(asset, :chain_id) and Map.has_key?(asset, :chain_name) and Map.has_key?(asset, :chain_symbol) and
-           Map.has_key?(asset, :chain_icon_url) do
-      true ->
-        a
-        |> Map.put("chainId", asset.chain_id)
-        |> Map.put("chainName", asset.chain_name)
-        |> Map.put("chainSymbol", asset.chain_symbol)
-        |> Map.put("chainIconUrl", asset.chain_icon_url)
-
-      false ->
-        a
-    end
-  end
-
-  defp prepare_batch_asset(asset) do
     init = %{
       "contractAddress" => to_string(asset.contract_address_hash),
       "nativeContractAddress" => if(is_nil(asset.native_contract_address), do: "", else: asset.native_contract_address),
