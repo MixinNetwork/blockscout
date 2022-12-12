@@ -240,6 +240,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
          {:block_param, {:ok, block}} <- {:block_param, fetch_block_param(params)},
          {:balance, {:ok, balance}} <- {:balance, Blocks.get_balance_as_of_block(address_hash, block)},
          {:ok, token_list} <- list_tokens(address_hash) do
+      IO.inspect(address_hash)
       user_assets_with_balance = Enum.map(token_list, fn x -> x.mixin_asset_id end)
 
       total_assets = Chain.list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})

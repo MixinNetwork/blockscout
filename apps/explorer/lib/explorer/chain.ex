@@ -88,7 +88,7 @@ defmodule Explorer.Chain do
   }
 
   alias Explorer.Market.MarketHistoryCache
-  alias Explorer.{ExchangeRates, KnownTokens, PagingOptions, Repo}
+  alias Explorer.{Etherscan, ExchangeRates, KnownTokens, PagingOptions, Repo}
   alias Explorer.SmartContract.Helper
 
   alias Dataloader.Ecto, as: DataloaderEcto
@@ -1697,6 +1697,78 @@ defmodule Explorer.Chain do
       _ ->
         []
     end
+  end
+
+  def search_batch_tokens(index_type, indices, user) do
+    if is_nil(user) do
+      Enum.map(
+        batch_search_tokens_without_user(index_type, indices),
+        fn x -> Map.from_struct(x) end
+      )
+    else
+      batch_search_tokens_with_user(index_type, indices, user)
+    end 
+  end
+
+  defp batch_search_tokens_without_user(index_type, indices) do
+    case index_type do
+      "contract" ->
+        address_hashes = Enum.map(indices, fn x -> 
+          x
+          |> Hash.Address.cast()
+          |> elem(1) 
+        end)
+
+        total_tokens = list_top_tokens("", paging_options: %PagingOptions{page_size: 1000})
+        Enum.filter(total_tokens, fn x -> 
+          Enum.member?(address_hashes, x.contract_address_hash)
+        end)
+
+      "uuid" ->
+        query = 
+          from(
+            token in Token,
+            where: token.mixin_asset_id in ^indices
+          )
+
+        Repo.all(query)
+    end
+  end
+
+  defp batch_search_tokens_with_user(index_type, indices, user_hash) do
+    tokens_with_balance = 
+      Enum.filter(
+        Etherscan.list_tokens(user_hash),
+        fn x -> 
+          index = if(index_type == "contract", do: x.contract_address_hash, else: x.mixin_asset_id)
+          Enum.member?(indices, index) 
+        end
+      )
+    fetched_token_indices = 
+      Enum.map(tokens_with_balance, fn x -> 
+        if(index_type == "contract", do: x.contract_address_hash, else: x.mixin_asset_id)
+      end)
+
+    rest_token_indices = Enum.filter(indices, fn x ->
+      case index_type do
+        "contract" ->
+          {:ok, hash} = Hash.Address.cast(x)
+          not Enum.member?(fetched_token_indices, hash)
+        "uuid" ->
+          not Enum.member?(fetched_token_indices, x)
+      end
+    end)
+
+    rest_tokens = Enum.map(
+      batch_search_tokens_without_user(index_type, rest_token_indices),
+      fn x -> 
+        x
+        |> Map.from_struct()
+        |> Map.put(:balance, "0")
+      end
+    )
+
+    tokens_with_balance ++ rest_tokens
   end
 
   @spec search_token_asset(String.t()) :: [Token.t()]

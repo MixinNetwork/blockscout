@@ -1,8 +1,10 @@
 defmodule BlockScoutWeb.API.RPC.TokenController do
   use BlockScoutWeb, :controller
-
+ 
+  alias Ecto.UUID
   alias BlockScoutWeb.API.RPC.Helpers
   alias Explorer.{Chain, PagingOptions}
+  alias Explorer.Chain.Hash.Address
 
   @filter_assets [
     # USDT ERC20
@@ -161,8 +163,105 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
     render(conn, :search, %{list: asset_list})
   end
 
+  def batchsearch(conn, params) do
+    with {:index_type, {:ok, index_type}} <- fetch_type(params),
+         {:indices, {:ok, indices}} <- fetch_indices(params),
+         {:user_address, user} <- fetch_user(params), 
+         {:ok, index_list} <- is_valid_type_and_indices(index_type, indices),
+         {:ok, user_address_hash} <- is_valid_user_address(user) do
+      tokens = Chain.search_batch_tokens(index_type, index_list, user_address_hash)
+
+      asset_list = Enum.map(tokens, fn t ->
+        info = Chain.token_add_price_and_chain_info(t)
+        Map.merge(t, info)
+      end)
+
+      render(conn, :batchsearch, %{list: asset_list})
+    else
+      {:index_type, :error} -> 
+        conn
+        |> put_status(200)
+        |> render(:error, error: "Type is required.")
+
+      {:indices, :error} ->    
+        conn
+        |> put_status(200)
+        |> render(:error, error: "Indices is required.")
+
+      {:error, :invalid_type} -> 
+        conn
+        |> put_status(200)
+        |> render(:error, error: "Invalid type. Type should be in ['contract', 'uuid'].")
+
+      {:error, :invalid_indices} ->
+        conn
+        |> put_status(200)
+        |> render(:error, error: "Invalid indices, indices should be either contract addresses or uuids split by ','.")
+
+      {:error, :invalid_user} -> 
+        conn
+        |> put_status(200)
+        |> render(:error, error: "Invalid user, user should be the address of wallet.") 
+    end
+  end
+
+  defp is_valid_type_and_indices(index_type, indices) do
+    index_list = String.split(indices, ",")
+
+    flag =
+      case index_type do
+        "contract" -> 
+          Enum.all?(index_list, fn x -> 
+            case Address.cast(x) do
+              {:ok, _} -> true
+              :error -> false
+            end
+          end)
+
+        "uuid" -> 
+          Enum.all?(index_list, fn x -> 
+            case UUID.cast(x) do
+              {:ok, _} -> true
+              :error -> false
+            end
+          end)
+
+        _ -> :error
+      end
+
+    case flag do
+      :error -> {:error, :invalid_type}
+      true -> {:ok, index_list}
+      false -> {:error, :invalid_indices}
+    end
+  end
+
+  defp is_valid_user_address(user) do
+    case user do 
+      :error -> {:ok, nil}
+      
+      {:ok, user_address} -> 
+        case Address.cast(user_address) do
+          {:ok, hash} -> {:ok, hash}
+          :error -> {:error, :invalid_user}
+        end
+    end
+  end
+
   defp fetch_contractaddress(params) do
     {:contractaddress_param, Map.fetch(params, "contractaddress")}
+  end
+ 
+  defp fetch_type(params) do
+    {:index_type, Map.fetch(params, "type")} 
+  end
+
+  defp fetch_indices(params) do
+    {:indices, Map.fetch(params, "indices")}
+  end
+
+  defp fetch_user(params) do
+    {:user_address, Map.fetch(params, "user")}
   end
 
   defp to_address_hash(address_hash_string) do
