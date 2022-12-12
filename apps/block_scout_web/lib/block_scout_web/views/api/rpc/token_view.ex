@@ -57,15 +57,15 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
     }
 
     Enum.reduce(
-      [:balance, :chain_id, :chain_name, :chain_symbol, :chain_icon_url], 
-      init, 
+      [:balance, :chain_id, :chain_name, :chain_symbol, :chain_icon_url],
+      init,
       fn field, acc ->
         if is_nil(asset[field]) do
           acc
         else
           Map.put(acc, field, asset[field])
         end
-      end               
+      end
     )
   end
 

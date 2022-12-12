@@ -350,12 +350,12 @@ defmodule BlockScoutWeb.Etherscan do
         "totalSupply" => "1000000000",
         "type" => "ERC-20",
         "mixinAssetId" => "3c6be09f-fe6c-4a33-a60c-543f216cd9e0",
-        "priceUSD": "0",
-        "priceBTC": "0",
-        "chainId": "43d61dcd-e413-450d-80b8-101d5e903357",
-        "chainName": "Ether",
-        "chainSymbol": "ETH",
-        "chainIconUrl":
+        priceUSD: "0",
+        priceBTC: "0",
+        chainId: "43d61dcd-e413-450d-80b8-101d5e903357",
+        chainName: "Ether",
+        chainSymbol: "ETH",
+        chainIconUrl:
           "https://mixin-images.zeromesh.net/zVDjOxNTQvVsA8h2B4ZVxuHoCF3DJszufYKWpd9duXUSbSapoZadC7_13cnWBqg0EmwmRcKGbJaUpA8wFfpgZA=s128"
       }
     ]
@@ -2308,16 +2308,17 @@ defmodule BlockScoutWeb.Etherscan do
         key: "indices",
         placeholder: "uuid1,uuid2,uuid3/addressHash1,addressHash2,addressHash3",
         type: "string",
-        description: "If the type above is set to 'uuid', you must provide the valid asset_id of mixin assets here to obtain the correspoding tokens; if the type above is 'contract', you must provide the contract address deployed on MVM."
-      },
+        description:
+          "If the type above is set to 'uuid', you must provide the valid asset_id of mixin assets here to obtain the correspoding tokens; if the type above is 'contract', you must provide the contract address deployed on MVM."
+      }
     ],
     optional_params: [
       %{
         key: "user",
         placenwholder: "addressHash",
-        type: "string",        
+        type: "string",
         description: "The token balances would be included in the response when the address of user is provided."
-      },
+      }
     ],
     responses: [
       %{
