@@ -13,7 +13,7 @@ defmodule Explorer.ExchangeRates do
   alias Explorer.Counters.Helper
   alias Explorer.ExchangeRates.{Source, Token}
 
-  @interval Helper.cache_period_default_in_minutes("CACHE_EXCHANGE_RATES_PERIOD", 10)
+  @interval Helper.cache_period_default_in_minutes("CACHE_EXCHANGE_RATES_PERIOD", 1)
   @table_name :exchange_rates
 
   @impl GenServer
