@@ -3,6 +3,14 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
 
   alias BlockScoutWeb.API.RPC.RPCView
 
+  @field_map %{
+    balance: "balance",
+    chain_id: "chainId",
+    chain_symbol: "chainSymbol",
+    chain_name: "chainName",
+    chain_icon_url: "chainIconUrl"
+  }
+
   def render("gettoken.json", %{token: token}) do
     RPCView.render("show.json", data: prepare_token(token))
   end
@@ -63,7 +71,7 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
         if is_nil(asset[field]) do
           acc
         else
-          Map.put(acc, field, asset[field])
+          Map.put(acc, @field_map[field], asset[field])
         end
       end
     )
