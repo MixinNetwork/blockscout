@@ -44,7 +44,7 @@ defmodule Explorer.Market do
 
   def add_price(%{mixin_asset_id: mixin_asset_id} = token) do
     usd_value = fetch_token_usd_value(mixin_asset_id)
-    Map.put(token, :usd_value, if(is_nil(usd_value), do: Decimal.new(0), else: usd_value))
+    Map.put(token, :usd_value, usd_value)
   end
 
   def add_price(%CurrentTokenBalance{token: token} = token_balance) do
