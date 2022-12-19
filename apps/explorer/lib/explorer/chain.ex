@@ -87,11 +87,14 @@ defmodule Explorer.Chain do
     AddressTransactionsGasUsageCounter
   }
 
+  alias Explorer.Etherscan.Blocks, as: EtherscanBlocks
   alias Explorer.Market.MarketHistoryCache
   alias Explorer.{Etherscan, ExchangeRates, KnownTokens, PagingOptions, Repo}
   alias Explorer.SmartContract.Helper
 
   alias Dataloader.Ecto, as: DataloaderEcto
+
+  @eth_asset_id "43d61dcd-e413-450d-80b8-101d5e903357"
 
   @default_paging_options %PagingOptions{page_size: 50}
 
@@ -1677,13 +1680,35 @@ defmodule Explorer.Chain do
   end
 
   def search_batch_tokens(index_type, indices, user) do
-    if is_nil(user) do
-      Enum.map(
-        batch_search_tokens_without_user(index_type, indices),
-        fn x -> Map.from_struct(x) end
+    token_list =
+      if is_nil(user) do
+        Enum.map(
+          batch_search_tokens_without_user(index_type, indices),
+          fn t -> Map.from_struct(t) end
+        )
+      else
+        batch_search_tokens_with_user(index_type, indices, user)
+      end
+
+    case index_type do
+      "contract" -> sort_token_list(token_list)
+      "uuid" -> sort_token_list(replace_eth_info(token_list, user))
+    end
+  end
+
+  defp sort_token_list(token_list) do
+    if Map.has_key?(hd(token_list), :balance) do
+      Enum.sort_by(
+        token_list,
+        fn t -> Decimal.to_integer(t.balance) end,
+        :desc
       )
     else
-      batch_search_tokens_with_user(index_type, indices, user)
+      Enum.sort_by(
+        token_list,
+        fn t -> String.first(t.symbol) end,
+        :asc
+      )
     end
   end
 
@@ -1747,11 +1772,57 @@ defmodule Explorer.Chain do
         fn x ->
           x
           |> Map.from_struct()
-          |> Map.put(:balance, "0")
+          |> Map.put(:balance, Decimal.new(0))
         end
       )
 
     tokens_with_balance ++ rest_tokens
+  end
+
+  defp replace_eth_info(token_list, user) do
+    Enum.map(token_list, fn t ->
+      asset_id = t.mixin_asset_id
+
+      if asset_id == @eth_asset_id do
+        get_eth_info(user)
+      else
+        t
+      end
+    end)
+  end
+
+  def get_eth_info(user) do
+    eth = %{
+      contract_address_hash: "",
+      native_contract_address: "",
+      mixin_asset_id: @eth_asset_id,
+      name: "Ether",
+      decimals: "18",
+      symbol: "ETH",
+      type: ""
+    }
+
+    case is_nil(user) do
+      true ->
+        eth
+
+      false ->
+        eth
+        |> Map.put(:balance, get_eth_balance(user))
+    end
+  end
+
+  defp get_eth_balance(user) do
+    case EtherscanBlocks.get_balance_as_of_block(user, :latest) do
+      {:ok, balance} ->
+        case Wei.dump(balance) do
+          {:ok, decimal} -> decimal
+          :error -> Decimal.new(0)
+        end
+
+      {:error, _} ->
+        Decimal.new(0)
+    end
   end
 
   @spec search_token_asset(String.t()) :: [Token.t()]
