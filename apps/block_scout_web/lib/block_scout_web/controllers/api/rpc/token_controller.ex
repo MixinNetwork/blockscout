@@ -128,6 +128,11 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
         conn
         |> put_status(200)
         |> render(:error, error: "Invalid user, user should be the address of wallet.")
+
+      {:error, :not_found} ->
+        conn
+        |> put_status(200)
+        |> render(:error, error: "User not found.")
     end
   end
 
@@ -165,9 +170,12 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
         {:ok, nil}
 
       {:ok, user_address} ->
-        case Address.cast(user_address) do
-          {:ok, hash} -> {:ok, hash}
+        with {:ok, hash} <- Address.cast(user_address),
+             :ok <- Chain.check_address_exists(hash) do
+          {:ok, hash}
+        else
           :error -> {:error, :invalid_user}
+          :not_found -> {:error, :not_found}
         end
     end
   end
