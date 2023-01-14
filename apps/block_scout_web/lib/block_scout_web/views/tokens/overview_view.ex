@@ -77,9 +77,13 @@ defmodule BlockScoutWeb.Tokens.OverviewView do
     if Map.has_key?(token, :custom_cap) && token.custom_cap do
       token.custom_cap
     else
-      tokens = CurrencyHelpers.divide_decimals(token.total_supply, token.decimals)
-      price = token.usd_value
-      Decimal.mult(tokens, price)
+      if is_nil(token.decimals) do
+        Decimal.new(0)
+      else
+        tokens = CurrencyHelpers.divide_decimals(token.total_supply, token.decimals)
+        price = token.usd_value
+        Decimal.mult(tokens, price)
+      end
     end
   end
 end

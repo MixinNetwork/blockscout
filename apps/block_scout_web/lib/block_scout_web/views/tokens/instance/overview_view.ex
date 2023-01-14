@@ -114,9 +114,13 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewView do
   end
 
   def total_supply_usd(token) do
-    tokens = CurrencyHelpers.divide_decimals(token.total_supply, token.decimals)
-    price = token.usd_value
-    Decimal.mult(tokens, price)
+    if is_nil(token.decimals) do
+      Decimal.new(0)
+    else
+      tokens = CurrencyHelpers.divide_decimals(token.total_supply, token.decimals)
+      price = token.usd_value
+      Decimal.mult(tokens, price)
+    end
   end
 
   def smart_contract_with_read_only_functions?(

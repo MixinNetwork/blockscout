@@ -38,15 +38,30 @@ defmodule BlockScoutWeb.AddressTokenBalanceView do
 
       sort_by_name = sort_2_tokens_by_name(token_name1, token_name2)
 
-      sort_2_tokens_by_value_desc_and_name(
-        token_balance1,
-        token_balance2,
-        usd_value1,
-        usd_value2,
-        sort_by_name,
-        token1,
-        token2
-      )
+      decimals1_is_nil = is_nil(token1.decimals)
+      decimals2_is_nil = is_nil(token2.decimals)
+
+      cond do
+        decimals1_is_nil and decimals2_is_nil ->
+          sort_by_name
+
+        decimals1_is_nil ->
+          false
+
+        decimals2_is_nil ->
+          true
+
+        true ->
+          sort_2_tokens_by_value_desc_and_name(
+            token_balance1,
+            token_balance2,
+            usd_value1,
+            usd_value2,
+            sort_by_name,
+            token1,
+            token2
+          )
+      end
     end)
   end
 
