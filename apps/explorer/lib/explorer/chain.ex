@@ -2873,7 +2873,7 @@ defmodule Explorer.Chain do
   end
 
   def balance_in_usd(_token_balance, %{decimals: nil}) do
-    nil
+    Decimal.new(0)
   end
 
   def balance_in_usd(token_balance, %{usd_value: usd_value, decimals: decimals}) do
