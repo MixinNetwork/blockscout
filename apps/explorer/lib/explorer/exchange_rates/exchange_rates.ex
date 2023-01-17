@@ -29,7 +29,8 @@ defmodule Explorer.ExchangeRates do
   @impl GenServer
   def handle_info({_ref, {:ok, tokens}}, state) do
     if store() == :ets do
-      records = Enum.map(tokens, &Token.to_tuple/1)
+      tokens_with_id = Enum.filter(tokens, fn t -> not is_nil(t.mixin_asset_id) end)
+      records = Enum.map(tokens_with_id, &Token.to_tuple/1)
       :ets.insert(table_name(), records)
     end
 
