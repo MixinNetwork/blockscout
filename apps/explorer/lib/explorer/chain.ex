@@ -2674,6 +2674,7 @@ defmodule Explorer.Chain do
         where: t.total_supply > ^0,
         where: t.type == "ERC-20",
         where: not is_nil(t.mixin_asset_id),
+        where: t.mixin_asset_id != @eth_asset_id,
         order_by: [desc_nulls_last: t.holder_count, asc: t.name],
         preload: [:contract_address]
       )
