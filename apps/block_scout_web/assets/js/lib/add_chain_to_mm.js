@@ -11,7 +11,7 @@ export async function addChainToMM ({ btn }) {
     const coinName = coinNameObj && coinNameObj.value
     const subNetworkObj = document.getElementById('js-subnetwork')
     // @ts-ignore
-    const subNetwork = subNetworkObj && subNetworkObj.value
+    
     const jsonRPCObj = document.getElementById('js-json-rpc')
     // @ts-ignore
     const jsonRPC = jsonRPCObj && jsonRPCObj.value
