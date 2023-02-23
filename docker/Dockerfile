@@ -2,7 +2,7 @@ FROM bitwalker/alpine-elixir-phoenix:1.13 AS builder
 
 WORKDIR /app
 
-RUN apk --no-cache --update add alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3 file qemu-x86_64 jq
+RUN apk --no-cache --update add alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3 file qemu-x86_64
 
 ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc \
     GLIBC_VERSION=2.30-r0 \
@@ -74,7 +74,10 @@ RUN mkdir -p /opt/release \
 ##############################################################
 FROM bitwalker/alpine-elixir-phoenix:1.13
 
+RUN apk --no-cache --update add jq
+
 WORKDIR /app
 
 COPY --from=builder /opt/release/blockscout .
 COPY --from=builder /app/apps/explorer/node_modules ./node_modules
+COPY --from=builder /app/config/config_helper.exs ./config/config_helper.exs

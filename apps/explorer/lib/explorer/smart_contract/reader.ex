@@ -144,11 +144,11 @@ defmodule Explorer.SmartContract.Reader do
       |> Enum.map(fn {method_id, args} ->
         %{
           contract_address: contract_address,
-          from: from,
           method_id: method_id,
           args: args,
           block_number: block_number
         }
+        |> (&if(!is_nil(from) && from != "", do: Map.put(&1, :from, from), else: &1)).()
       end)
 
     requests
@@ -347,24 +347,25 @@ defmodule Explorer.SmartContract.Reader do
   end
 
   def fetch_current_value_from_blockchain(function, abi, contract_address_hash, leave_error_as_map, from \\ nil) do
-    values =
-      case function do
-        %{"inputs" => []} ->
-          method_id = function["method_id"]
-          args = function["inputs"]
-          outputs = function["outputs"]
+    case function do
+      %{"inputs" => []} ->
+        method_id = function["method_id"]
+        args = function["inputs"]
+        outputs = function["outputs"]
 
+        values =
           contract_address_hash
           |> query_verified_contract(%{method_id => normalize_args(args)}, from, leave_error_as_map, abi)
           |> link_outputs_and_values(outputs, method_id)
 
-        _ ->
-          link_outputs_and_values(%{}, Map.get(function, "outputs", []), function["method_id"])
-      end
+        function
+        |> Map.replace!("outputs", values)
+        |> Map.put("abi_outputs", Map.get(function, "outputs", []))
 
-    function
-    |> Map.replace!("outputs", values)
-    |> Map.put("abi_outputs", link_outputs_and_values(%{}, Map.get(function, "outputs", []), function["method_id"]))
+      _ ->
+        function
+        |> Map.put("abi_outputs", Map.get(function, "outputs", []))
+    end
   end
 
   @doc """

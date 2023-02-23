@@ -1,17 +1,18 @@
 #!/bin/sh
 
+# export ACCOUNT_POOL_SIZE=1
 export MIX_ENV=prod
-export SECRET_KEY_BASE=CONFIGURE_RANDOM_SECRET_KEY_BASE
-export DATABASE_URL=postgresql://user:password@blockscout-postgresql-0:5432/blockscout
+export SECRET_KEY_BASE=SbN9xzuWTx5bhEFxDtuaHun0w6xBhlImzoH/GIaNV5A8ADbQ3B7TOLVWWdqR9S/M
+export DATABASE_URL=postgresql://postgres:123456@localhost:5432/blockscout
 export ETHEREUM_JSONRPC_VARIANT=geth
-export ETHEREUM_JSONRPC_HTTP_URL=http://blockscout-archive-0:8545
-export ETHEREUM_JSONRPC_WS_URL=ws://blockscout-archive-0:8546
+export ETHEREUM_JSONRPC_HTTP_URL=https://geth.mvm.dev
+#export ETHEREUM_JSONRPC_WS_URL=wws://geth.mvm.dev
 export BLOCKSCOUT_PROTOCOL=https
-export BLOCKSCOUT_HOST=scan.mvm.dev
+export BLOCKSCOUT_HOST=www.hundredark.site
 export PORT=4000
 export EXCHANGE_RATES_COINGECKO_COIN_ID=ethereum
-export EXCHANGE_RATES_COINGECKO_API_KEY=CONFIGURE_COINGECKO_API_KEY
-export BLOCK_TRANSFORMER=clique
+#export EXCHANGE_RATES_COINGECKO_API_KEY=CONFIGURE_COINGECKO_API_KEY
+export BLOCK_TRANSFORMER=base
 export DISABLE_READ_API=false
 export DISABLE_WRITE_API=true
 export INDEXER_MEMORY_LIMIT=12
@@ -31,7 +32,7 @@ export COIN_NAME=ETH
 export NETWORK='Mixin Virtual Machine'
 export SUBNETWORK='MVM'
 export NETWORK_PATH=/
-export WEBAPP_URL=https://scan.mvm.dev
+export WEBAPP_URL=www.hundredark.site
 export JSON_RPC=https://geth.mvm.dev
 export SUPPORTED_CHAINS='[ { "title": "MVM", "url": "https://scan.mvm.dev" }]'
 export LINK_TO_OTHER_EXPLORERS=false
@@ -40,4 +41,4 @@ export LOGO_FOOTER=/images/mvm-logo-footer.svg
 export ENABLE_RUST_VERIFICATION_SERVICE=true
 export RUST_VERIFICATION_SERVICE_URL=http://0.0.0.0:8043/
 
-/opt/elixir/bin/mix phx.server
+mix phx.server 

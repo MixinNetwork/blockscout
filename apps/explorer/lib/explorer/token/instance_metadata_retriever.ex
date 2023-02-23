@@ -148,7 +148,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
     fetch_json(%{@token_uri => {:ok, [decoded_json]}}, hex_token_id)
   rescue
     e ->
-      Logger.debug(["Unknown metadata format #{inspect(json)}. error #{inspect(e)}"],
+      Logger.debug(["Unknown metadata format #{inspect(json)}.", Exception.format(:error, e, __STACKTRACE__)],
         fetcher: :token_instances
       )
 
@@ -161,7 +161,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
     fetch_json(%{@uri => {:ok, [decoded_json]}}, hex_token_id)
   rescue
     e ->
-      Logger.debug(["Unknown metadata format #{inspect(json)}. error #{inspect(e)}"],
+      Logger.debug(["Unknown metadata format #{inspect(json)}.", Exception.format(:error, e, __STACKTRACE__)],
         fetcher: :token_instances
       )
 
@@ -169,7 +169,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
   end
 
   def fetch_json(%{@token_uri => {:ok, ["data:application/json;base64," <> base64_encoded_json]}}, hex_token_id) do
-    case Base.url_decode64(base64_encoded_json) do
+    case Base.decode64(base64_encoded_json) do
       {:ok, base64_decoded} ->
         fetch_json(%{@token_uri => {:ok, [base64_decoded]}}, hex_token_id)
 
@@ -178,7 +178,11 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
     end
   rescue
     e ->
-      Logger.debug(["Unknown metadata format base64 #{inspect(base64_encoded_json)}. error #{inspect(e)}"],
+      Logger.debug(
+        [
+          "Unknown metadata format base64 #{inspect(base64_encoded_json)}.",
+          Exception.format(:error, e, __STACKTRACE__)
+        ],
         fetcher: :token_instances
       )
 
@@ -186,7 +190,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
   end
 
   def fetch_json(%{@uri => {:ok, ["data:application/json;base64," <> base64_encoded_json]}}, hex_token_id) do
-    case Base.url_decode64(base64_encoded_json) do
+    case Base.decode64(base64_encoded_json) do
       {:ok, base64_decoded} ->
         fetch_json(%{@uri => {:ok, [base64_decoded]}}, hex_token_id)
 
@@ -195,7 +199,8 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
     end
   rescue
     e ->
-      Logger.debug(["Unknown metadata format base64 #{inspect(base64_encoded_json)}. error #{inspect(e)}"],
+      Logger.debug(
+        ["Unknown metadata format base64 #{inspect(base64_encoded_json)}", Exception.format(:error, e, __STACKTRACE__)],
         fetcher: :token_instances
       )
 
@@ -228,7 +233,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
     check_type(json, hex_token_id)
   rescue
     e ->
-      Logger.debug(["Unknown metadata format #{inspect(json)}. error #{inspect(e)}"],
+      Logger.debug(["Unknown metadata format #{inspect(json)}.", Exception.format(:error, e, __STACKTRACE__)],
         fetcher: :token_instances
       )
 
@@ -241,7 +246,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
     check_type(json, hex_token_id)
   rescue
     e ->
-      Logger.debug(["Unknown metadata format #{inspect(json)}. error #{inspect(e)}"],
+      Logger.debug(["Unknown metadata format #{inspect(json)}.", Exception.format(:error, e, __STACKTRACE__)],
         fetcher: :token_instances
       )
 
@@ -282,7 +287,8 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
     end
   rescue
     e ->
-      Logger.debug(["Could not send request to token uri #{inspect(uri)}. error #{inspect(e)}"],
+      Logger.debug(
+        ["Could not send request to token uri #{inspect(uri)}.", Exception.format(:error, e, __STACKTRACE__)],
         fetcher: :token_instances
       )
 

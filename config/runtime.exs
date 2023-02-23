@@ -7,14 +7,16 @@ indexer_memory_limit_default = 1
 indexer_memory_limit =
   "INDEXER_MEMORY_LIMIT"
   |> System.get_env(to_string(indexer_memory_limit_default))
+  |> String.downcase()
   |> Integer.parse()
   |> case do
-    {integer, ""} -> integer
-    _ -> indexer_memory_limit_default
+    {integer, g} when g in ["g", "gb", ""] -> integer <<< 30
+    {integer, m} when m in ["m", "mb"] -> integer <<< 20
+    _ -> indexer_memory_limit_default <<< 30
   end
 
 config :indexer,
-  memory_limit: indexer_memory_limit <<< 30
+  memory_limit: indexer_memory_limit
 
 indexer_empty_blocks_sanitizer_batch_size_default = 100
 
@@ -100,7 +102,10 @@ config :block_scout_web,
   new_tags: System.get_env("NEW_TAGS"),
   chain_id: System.get_env("CHAIN_ID"),
   json_rpc: System.get_env("JSON_RPC"),
-  verification_max_libraries: verification_max_libraries
+  disable_add_to_mm_button: System.get_env("DISABLE_ADD_TO_MM_BUTTON", "false") == "true",
+  verification_max_libraries: verification_max_libraries,
+  permanent_dark_mode_enabled: System.get_env("PERMANENT_DARK_MODE_ENABLED", "false") == "true",
+  permanent_light_mode_enabled: System.get_env("PERMANENT_LIGHT_MODE_ENABLED", "false") == "true"
 
 default_api_rate_limit = 50
 default_api_rate_limit_str = Integer.to_string(default_api_rate_limit)
@@ -133,6 +138,7 @@ api_rate_limit_by_ip_value =
   end
 
 config :block_scout_web, :api_rate_limit,
+  disabled: System.get_env("API_RATE_LIMIT_DISABLED", "false") == "true",
   global_limit: global_api_rate_limit_value,
   limit_by_key: api_rate_limit_by_key_value,
   limit_by_ip: api_rate_limit_by_ip_value,
@@ -180,7 +186,10 @@ config :ethereum_jsonrpc,
   disable_archive_balances?: System.get_env("ETHEREUM_JSONRPC_DISABLE_ARCHIVE_BALANCES", "false") == "true"
 
 debug_trace_transaction_timeout = System.get_env("ETHEREUM_JSONRPC_DEBUG_TRACE_TRANSACTION_TIMEOUT", "5s")
-config :ethereum_jsonrpc, EthereumJSONRPC.Geth, debug_trace_transaction_timeout: debug_trace_transaction_timeout
+
+config :ethereum_jsonrpc, EthereumJSONRPC.Geth,
+  debug_trace_transaction_timeout: debug_trace_transaction_timeout,
+  tracer: System.get_env("INDEXER_INTERNAL_TRANSACTIONS_TRACER_TYPE", "call_tracer")
 
 config :ethereum_jsonrpc, EthereumJSONRPC.PendingTransaction,
   type: System.get_env("ETHEREUM_JSONRPC_PENDING_TRANSACTIONS_TYPE", "default")
@@ -219,10 +228,6 @@ config :explorer,
   restricted_list: System.get_env("RESTRICTED_LIST", nil),
   restricted_list_key: System.get_env("RESTRICTED_LIST_KEY", nil)
 
-config :explorer, Explorer.Visualize.Sol2uml,
-  service_url: System.get_env("VISUALIZE_SOL2UML_SERVICE_URL"),
-  enabled: System.get_env("VISUALIZE_SOL2UML_ENABLED") == "true"
-
 config :explorer, Explorer.Chain.Events.Listener,
   enabled:
     if(disable_webapp == "true" && disable_indexer == "true",
@@ -252,6 +257,42 @@ address_sum_global_ttl =
 config :explorer, Explorer.Chain.Cache.AddressSum, global_ttl: address_sum_global_ttl
 
 config :explorer, Explorer.Chain.Cache.AddressSumMinusBurnt, global_ttl: address_sum_global_ttl
+
+block_count_global_ttl =
+  "CACHE_BLOCK_COUNT_PERIOD"
+  |> System.get_env("")
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> 7200
+  end
+  |> :timer.seconds()
+
+config :explorer, Explorer.Chain.Cache.Block, global_ttl: block_count_global_ttl
+
+transaction_count_global_ttl =
+  "CACHE_TXS_COUNT_PERIOD"
+  |> System.get_env("")
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> 7200
+  end
+  |> :timer.seconds()
+
+config :explorer, Explorer.Chain.Cache.Transaction, global_ttl: transaction_count_global_ttl
+
+gas_price_oracle_global_ttl =
+  "GAS_PRICE_ORACLE_CACHE_PERIOD"
+  |> System.get_env("")
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> 30
+  end
+  |> :timer.seconds()
+
+config :explorer, Explorer.Chain.Cache.GasPriceOracle, global_ttl: gas_price_oracle_global_ttl
 
 config :explorer, Explorer.ExchangeRates,
   store: :ets,
@@ -354,6 +395,14 @@ config :explorer, Explorer.SmartContract.RustVerifierInterface,
   service_url: System.get_env("RUST_VERIFICATION_SERVICE_URL"),
   enabled: System.get_env("ENABLE_RUST_VERIFICATION_SERVICE") == "true"
 
+config :explorer, Explorer.Visualize.Sol2uml,
+  service_url: System.get_env("VISUALIZE_SOL2UML_SERVICE_URL"),
+  enabled: System.get_env("VISUALIZE_SOL2UML_ENABLED") == "true"
+
+config :explorer, Explorer.SmartContract.SigProviderInterface,
+  service_url: System.get_env("SIG_PROVIDER_SERVICE_URL"),
+  enabled: System.get_env("SIG_PROVIDER_ENABLED") == "true"
+
 config :explorer, Explorer.ThirdPartyIntegrations.AirTable,
   table_url: System.get_env("ACCOUNT_PUBLIC_TAGS_AIRTABLE_URL"),
   api_key: System.get_env("ACCOUNT_PUBLIC_TAGS_AIRTABLE_API_KEY")
@@ -423,6 +472,17 @@ config :indexer,
   trace_first_block: System.get_env("TRACE_FIRST_BLOCK") || "",
   trace_last_block: System.get_env("TRACE_LAST_BLOCK") || "",
   fetch_rewards_way: System.get_env("FETCH_REWARDS_WAY", "trace_block")
+
+config :indexer, Indexer.Fetcher.TransactionAction.Supervisor,
+  enabled: System.get_env("INDEXER_TX_ACTIONS_ENABLE", "false") == "true"
+
+config :indexer, Indexer.Fetcher.TransactionAction,
+  reindex_first_block: System.get_env("INDEXER_TX_ACTIONS_REINDEX_FIRST_BLOCK"),
+  reindex_last_block: System.get_env("INDEXER_TX_ACTIONS_REINDEX_LAST_BLOCK"),
+  reindex_protocols: System.get_env("INDEXER_TX_ACTIONS_REINDEX_PROTOCOLS", "")
+
+config :indexer, Indexer.Transform.TransactionActions,
+  max_token_cache_size: System.get_env("INDEXER_TX_ACTIONS_MAX_TOKEN_CACHE_SIZE")
 
 {receipts_batch_size, _} = Integer.parse(System.get_env("INDEXER_RECEIPTS_BATCH_SIZE", "250"))
 {receipts_concurrency, _} = Integer.parse(System.get_env("INDEXER_RECEIPTS_CONCURRENCY", "10"))
@@ -505,6 +565,14 @@ blocks_catchup_fetcher_missing_ranges_batch_size_default_str = "100000"
 
 config :indexer, Indexer.Block.Catchup.MissingRangesCollector,
   missing_ranges_batch_size: blocks_catchup_fetcher_missing_ranges_batch_size
+
+{block_reward_fetcher_batch_size, _} = Integer.parse(System.get_env("INDEXER_BLOCK_REWARD_BATCH_SIZE", "10"))
+
+{block_reward_fetcher_concurrency, _} = Integer.parse(System.get_env("INDEXER_BLOCK_REWARD_CONCURRENCY", "4"))
+
+config :indexer, Indexer.Fetcher.BlockReward,
+  batch_size: block_reward_fetcher_batch_size,
+  concurrency: block_reward_fetcher_concurrency
 
 {internal_transaction_fetcher_batch_size, _} =
   Integer.parse(System.get_env("INDEXER_INTERNAL_TRANSACTIONS_BATCH_SIZE", "10"))
